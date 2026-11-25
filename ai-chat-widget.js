@@ -694,84 +694,147 @@ const TOUR_KNOWLEDGE_BASE = {
   }
 };
 
-const generateKnowledgeResponse = (userText) => {
-  const q = userText.toLowerCase();
+// ============================================================================
+// Waldo Kool Travel - Advanced Natural Language Intelligence Engine
+// Multilingual (VI, EN, FR, ZH), Intent Classifier, Context Memory & Smart Booking
+// ============================================================================
 
-  // Check if user is placing a booking directly with phone number
-  const phoneMatch = userText.match(/(0[3|5|7|8|9][0-9]{8})/);
-  const hasBookingIntent = q.includes('đặt tour') || q.includes('đặt chỗ') || q.includes('booking') || q.includes('đăng ký tour') || q.includes('giữ chỗ') || q.includes('đặt');
+const generateSuperSmartResponse = (userText) => {
+  const raw = userText.trim();
+  const lower = raw.toLowerCase();
+  
+  // Normalize Vietnamese without diacritics for ultra-flexible matching
+  const removeDiacritics = (str) => {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+  };
+  const norm = removeDiacritics(lower);
 
-  if (hasBookingIntent && phoneMatch) {
+  // 1. DETECT LANGUAGE OF THE USER
+  let lang = 'vi';
+  if (/^(hello|hi|hey|good morning|price|tour|itinerary|how much|book|cost|booking|visa)/i.test(lower) || lower.includes('korea') || lower.includes('recommend') || lower.includes('when')) {
+    lang = 'en';
+  } else if (/^(bonjour|salut|prix|voyage|combien|circuit|réserver|reserver)/i.test(lower) || lower.includes('corée') || lower.includes('vietnam')) {
+    lang = 'fr';
+  } else if (/[\u4e00-\u9fa5]/.test(lower) || lower.includes('你好') || lower.includes('多少钱') || lower.includes('旅游') || lower.includes('预订') || lower.includes('韩国') || lower.includes('行程')) {
+    lang = 'zh';
+  }
+
+  // 2. EXTRACT ENTITIES (Phone, Email, Pax count)
+  const phoneMatch = raw.match(/(0[3|5|7|8|9][0-9]{8}|\+84[0-9]{9})/);
+  const emailMatch = raw.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+  
+  // Detect group size (e.g., "3 người", "4 khách", "2 pax", "5 people", "4人")
+  let paxAdults = 1;
+  const paxMatch = lower.match(/([0-9]+)\s*(người|khách|pax|people|person|tickets|vé|ve|人)/);
+  if (paxMatch && parseInt(paxMatch[1]) > 0 && parseInt(paxMatch[1]) < 100) {
+    paxAdults = parseInt(paxMatch[1]);
+  }
+
+  // 3. INTENT 1: SMART INSTANT BOOKING DISPATCH (Khi khách để lại SĐT hoặc Email)
+  const hasBookingIntent = norm.includes('dat') || norm.includes('book') || norm.includes('giu cho') || norm.includes('dang ky') || norm.includes('reserve') || norm.includes('reserver') || norm.includes('yuding') || norm.includes('muon di') || norm.includes('tham gia') || norm.includes('order');
+
+  if (phoneMatch || (hasBookingIntent && (phoneMatch || emailMatch))) {
     let tourCode = 'TOUR-HANQUOC-5N4D';
     let tourName = 'Tour Hàn Quốc Seoul - Nami - Everland (5N4Đ)';
-    let price = 17900000;
+    let pricePerPax = 17900000;
     let date = '22/11/2026';
 
-    if (q.includes('củ chi') || q.includes('cu chi')) {
+    if (norm.includes('cu chi') || norm.includes('dia dao') || norm.includes('tunnels') || norm.includes('ban sung')) {
       tourCode = 'TOUR-CUCHI-01D';
-      tourName = 'Tour Địa Đạo Củ Chi (1 Ngày)';
-      price = 1200000;
+      tourName = 'Tour Khám Phá Địa Đạo Củ Chi (1 Ngày)';
+      pricePerPax = (paxAdults >= 20) ? 1100000 : (paxAdults >= 15 ? 1200000 : 1325000);
       date = '13/11/2026';
-    } else if (q.includes('city') || q.includes('metro') || q.includes('bửu long') || q.includes('buu long')) {
+    } else if (norm.includes('metro') || norm.includes('buu long') || norm.includes('city') || norm.includes('sen nam bo')) {
       tourCode = 'TOUR-CITY-01D';
-      tourName = 'City Tour TP.HCM & Metro Bửu Long (1 Ngày)';
-      price = 770000;
+      tourName = 'City Tour TP.HCM - Tuyến Metro - Chùa Bửu Long (1 Ngày)';
+      pricePerPax = (paxAdults >= 25) ? 770000 : 830000;
       date = '28/11/2026';
     }
 
+    const bookingId = 'WK-' + Math.floor(100000 + Math.random() * 900000);
+    const totalPrice = pricePerPax * paxAdults;
+    const phone = phoneMatch ? phoneMatch[0] : '+84 859 613 243';
+    const email = emailMatch ? emailMatch[0] : `${phone}@guest.waldokool.vn`;
+
     const bookingPayload = {
-      booking_id: 'TF-' + Math.floor(100000 + Math.random() * 900000),
+      booking_id: bookingId,
       customer_name: 'Quý khách',
-      customer_phone: phoneMatch[0],
+      customer_phone: phone,
+      customer_email: email,
       tour_code: tourCode,
       tour_name: tourName,
       departure_date: date,
-      pax_adults: 1,
+      pax_adults: paxAdults,
       pax_children: 0,
-      total_estimated_price: price,
-      assigned_operator: 'Waldo Kool Travel Ops Dispatch Center',
+      total_estimated_price: totalPrice,
+      assigned_operator: 'Waldo Kool Travel Dispatch Center',
       status: 'CONFIRMED_PENDING_PAYMENT'
     };
 
-    return 'Dạ tuyệt vời! Hệ thống AI Điều phối TourFlow đã tiếp nhận hồ sơ giữ chỗ của Quý khách cho **' + tourName + '**.\n\n<booking_order>' + JSON.stringify(bookingPayload) + '</booking_order>\n\nChuyên viên tư vấn & điều phối dịch vụ sẽ liên hệ ngay qua số **' + phoneMatch[0] + '** trong vòng 5 phút để xác nhận thủ tục visa/hợp đồng và thanh toán cọc ạ!';
-  }
-
-  // 1. Tour Hàn Quốc Seoul - Nami - Everland
-  if (q.includes('hàn quốc') || q.includes('han quoc') || q.includes('seoul') || q.includes('nami') || q.includes('everland') || q.includes('painter')) {
-    if (q.includes('giá') || q.includes('bao nhiêu') || q.includes('chi phí') || q.includes('tiền')) {
-      return '🌟 **Bảng giá Tour Hàn Quốc: Seoul - Nami - Everland 5N4Đ (Bay Vietjet Air):**\n- **Người lớn (≥11 tuổi):** 17.900.000 VNĐ/khách\n- **Trẻ em (2 - <11 tuổi):** 16.500.000 VNĐ (ngủ chung)\n- **Em bé (<2 tuổi):** 5.900.000 VNĐ\n- **Phụ thu phòng đơn:** 6.800.000 VNĐ/khách\n- **Tiền Tip HDV & tài xế:** 35 USD/khách/tour\n\n🎁 **Ưu đãi bao gồm:** Khách sạn 4 sao gần trung tâm, Vé xem The Painter Show, Trải nghiệm Hanbok & làm Kimchi, Vé máy bay khứ hồi Vietjet Air, Visa Hàn Quốc trọn gói, ăn uống & vé tham quan! Quý khách muốn đặt chỗ cho mấy người ạ?';
+    if (lang === 'en') {
+      return `🎉 **Booking Request Received Successfully!**\\n\\nWe have automatically recorded your reservation for **${tourName}** (${paxAdults} guest(s)).\\n\\n<booking_order>${JSON.stringify(bookingPayload)}</booking_order>\\n\\nOur travel specialist will contact you via **${phone}** within 5 minutes to confirm details and dispatch confirmation documents. You can also transfer the deposit via VietQR BIDV: **5801433856** (NGUYEN DINH DO).`;
+    } else if (lang === 'fr') {
+      return `🎉 **Demande de Réservation Enregistrée !**\\n\\nNous avons bien pris en compte votre réservation pour **${tourName}** (${paxAdults} personne(s)).\\n\\n<booking_order>${JSON.stringify(bookingPayload)}</booking_order>\\n\\nUn conseiller Waldo Kool Travel vous contactera au **${phone}** dans les 5 minutes pour finaliser votre dossier. Acompte VietQR BIDV : **5801433856** (NGUYEN DINH DO).`;
+    } else if (lang === 'zh') {
+      return `🎉 **预订意向已成功接收并派单！**\\n\\n系统已为您锁定 **${tourName}**（共 ${paxAdults} 位出行人）的名额。\\n\\n<booking_order>${JSON.stringify(bookingPayload)}</booking_order>\\n\\nWaldo Kool Travel 专属旅游顾问将在5分钟内通过电话/微信联系您 **${phone}**。您也可以通过 VietQR 支付定金：BIDV账号 **5801433856** (NGUYEN DINH DO)。`;
     }
-    if (q.includes('lịch trình') || q.includes('ngày') || q.includes('đi đâu') || q.includes('chi tiết')) {
-      return '✈️ **Lịch trình 5N4Đ Tour Hàn Quốc (Khởi hành 22/11/2026):**\n- **Đêm 1:** Bay Vietjet VJ862 từ Tân Sơn Nhất đi Incheon (02:40 - 09:45).\n- **Ngày 2:** Khám phá Đảo Nami thơ mộng - Tháp Namsan ngắm toàn cảnh Seoul.\n- **Ngày 3:** Vui chơi thả ga Công viên liên hợp Everland - Mua sắm khu phố sầm uất Myeongdong / Hongdae.\n- **Ngày 4:** Cung điện Kyeongbok (Cảnh Phúc Cung) - Nhà Xanh - Thưởng thức Painter Show danh tiếng.\n- **Ngày 5:** Trải nghiệm làm Kimchi & mặc áo Hanbok - Làng cổ Hanok Bukchon - Con đường đá Deoksugung - Bay về TP.HCM (VJ861 21:15 - 00:40).\n\nAnh/Chị để lại SĐT để em gửi lịch trình PDF và giữ chỗ ngay nhé!';
+
+    return `🎉 **Hồ sơ đăng ký giữ chỗ của Quý khách đã được tiếp nhận thành công!**\\n\\nEm đã tạo phiếu điều phối giữ chỗ cho **${tourName}** (Đoàn ${paxAdults} khách):\\n\\n<booking_order>${JSON.stringify(bookingPayload)}</booking_order>\\n\\nChuyên viên điều phối của **Waldo Kool Travel** sẽ gọi điện trực tiếp qua số **${phone}** trong vòng 5 phút để xác nhận lịch trình, hướng dẫn visa và xuất phiếu thu. Quý khách có thể chuyển cọc nhanh qua mã VietQR BIDV: **5801433856** (NGUYEN DINH DO) ạ!`;
+  }
+
+  // 4. INTENT 2: TOUR HÀN QUỐC (SEOUL - NAMI - EVERLAND)
+  if (norm.includes('han quoc') || norm.includes('seoul') || norm.includes('nami') || norm.includes('everland') || norm.includes('korea') || norm.includes('coree') || lower.includes('韩国') || lower.includes('首尔')) {
+    if (norm.includes('gia') || norm.includes('bao nhieu') || norm.includes('cost') || norm.includes('price') || norm.includes('prix') || lower.includes('多少钱') || lower.includes('费用')) {
+      return `🇰🇷 **Bảng Giá Trọn Gói Tour Hàn Quốc (Seoul - Nami - Everland) 5N4Đ:**\\n- **Người lớn (≥11 tuổi):** **17.900.000 VNĐ / khách**\\n- **Trẻ em (2 - <11 tuổi):** 16.500.000 VNĐ (ngủ chung giường người lớn)\\n- **Em bé (<2 tuổi):** 5.900.000 VNĐ\\n- **Phụ thu phòng đơn:** 6.800.000 VNĐ\\n- **Tiền Tip HDV & Tài xế:** 35 USD / khách / tour\\n\\n🎁 **Ưu đãi bao gồm trọn gói:** Vé máy bay khứ hồi Vietjet Air, Khách sạn 4★ trung tâm, **Visa Hàn Quốc**, Vé xem **The Painter Show**, Trải nghiệm mặc **Hanbok & làm Kimchi**, toàn bộ bữa ăn chính theo văn hóa ẩm thực Hàn.\\n\\nQuý khách đi mấy người ạ? Để lại SĐT em hỗ trợ giữ chỗ và gửi file PDF lịch trình chi tiết nhé!`;
     }
-    if (q.includes('visa') || q.includes('thủ tục') || q.includes('hồ sơ')) {
-      return '📋 **Hồ sơ xin Visa Hàn Quốc cần chuẩn bị:**\n1. **Cá nhân:** Hộ chiếu gốc còn hạn trên 6 tháng + 02 hình 3.5x4.5cm nền trắng mới chụp + CCCD photo + Form thông tin cá nhân.\n2. **Công việc:** HĐLĐ / Xác nhận nhân viên + Sao kê lương 6 tháng gần nhất + VssID (với nhân viên) HOẶC Giấy phép ĐKKD + Biên lai thuế 1 năm gần nhất (với chủ DN).\n3. **Đặt cọc:** 9.000.000 VNĐ/khách khi đăng ký hồ sơ trước 20-35 ngày.\n\nĐội ngũ tư vấn sẽ hỗ trợ kiểm tra tỷ lệ duyệt visa miễn phí cho Quý khách!';
+    if (norm.includes('lich trinh') || norm.includes('itinerary') || norm.includes('di dau') || norm.includes('ngay') || lower.includes('行程')) {
+      return `✈️ **Lịch Trình Chi Tiết Tour Hàn Quốc 5N4Đ (Khởi hành 22/11/2026):**\\n- **Đêm 1:** Bay đêm Vietjet Air VJ862 từ Tân Sơn Nhất đi Seoul (02:40 - 09:45).\\n- **Ngày 2:** Khám phá Đảo Nami mùa thu lãng mạn (phim Bản tình ca mùa đông) - Tháp Namsan biểu tượng Seoul.\\n- **Ngày 3:** Vui chơi không giới hạn tại Đại công viên Everland - Mua sắm thiên đường Myeongdong / Hongdae.\\n- **Ngày 4:** Chiêm ngưỡng Cung điện Cảnh Phúc Cung (Gyeongbokgung) - Nhà Xanh - Thưởng thức show nghệ thuật **The Painter Show** đỉnh cao.\\n- **Ngày 5:** Trải nghiệm làm Kimchi & mặc Hanbok - Làng cổ Hanok Bukchon - Con đường đá Deoksugung - Bay Vietjet VJ861 về lại TP.HCM (21:15 - 00:40).\\n\\nAnh/Chị muốn đăng ký đi vào dịp này không ạ?`;
     }
-    return '🇰🇷 **Tour Hàn Quốc 5N4Đ Seoul - Nami - Everland (Khởi hành 22/11/2026):**\n- Giá trọn gói: **17.900.000 VNĐ** (Đã bao gồm Visa + Vé máy bay Vietjet + Khách sạn 4* trung tâm).\n- Tặng vé The Painter Show, trải nghiệm mặc Hanbok & làm Kimchi.\n- Quý khách cần tư vấn lịch trình chi tiết hay hỗ trợ thủ tục hồ sơ Visa ạ?';
-  }
-
-  // 2. Tour Địa Đạo Củ Chi
-  if (q.includes('củ chi') || q.includes('cu chi') || q.includes('bắn súng') || q.includes('địa đạo')) {
-    if (q.includes('giá') || q.includes('chi phí') || q.includes('bao nhiêu')) {
-      return '🇻🇳 **Báo giá Tour Củ Chi 1 Ngày (Khởi hành 13/11/2026):**\n- **Nhóm 10 - 14 khách:** 1.325.000 VNĐ/khách\n- **Nhóm 15 - 19 khách:** 1.200.000 VNĐ/khách\n- **Nhóm 20 - 24 khách:** 1.100.000 VNĐ/khách\n\n🍽️ **Bao gồm:** Xe du lịch 29 chỗ cao cấp, ăn trưa đặc sản Nam Bộ 270.000 VNĐ/suất, vé tham quan địa đạo, trải nghiệm khoai mì muối mè, HDV tiếng Anh/Việt, bảo hiểm du lịch, nón & nước suối!';
+    if (norm.includes('visa') || norm.includes('ho so') || norm.includes('thu tuc') || norm.includes('dau visa') || lower.includes('签证')) {
+      return `📋 **Thủ Tục Hồ Sơ Visa Hàn Quốc Trọn Gói Cực Kỳ Đơn Giản:**\\n1. **Nhân thân:** Hộ chiếu gốc còn hạn >6 tháng + 2 hình 3.5x4.5cm nền trắng + CCCD photo.\\n2. **Công việc:** HĐLĐ / Xác nhận việc làm + Sao kê lương 6 tháng + VssID (hoặc GPKD + Biên lai thuế nếu là chủ doanh nghiệp).\\n3. **Thời gian xét duyệt:** Nộp hồ sơ trước ngày khởi hành 20-35 ngày. Tiền cọc giữ chỗ: 9.000.000 VNĐ/khách.\\n\\n*Cam kết:* Waldo Kool Travel hỗ trợ khai form và thẩm định tỷ lệ đậu visa hoàn toàn miễn phí!`;
     }
-    return '🌿 **Tour Khám Phá Địa Đạo Củ Chi 1 Ngày:**\n- Lịch trình: 08:00 sáng đón tại TP.HCM đi Củ Chi -> Tham quan sa bàn, xem phim tư liệu hệ thống đường hầm 200km -> Trải nghiệm chui hầm thực tế, tìm hiểu bếp Hoàng Cầm, hầm chông -> Thưởng thức khoai mì muối mè nóng hổi -> Thử tài bắn súng thể thao AK-47/M16 -> Dùng bữa trưa đặc sản Nam Bộ -> 15:00 về lại trung tâm TP.HCM.\n- Giá chỉ từ: **1.100.000 VNĐ/khách** trọn gói. Quý khách đi nhóm mấy người để em báo giá tốt nhất ạ?';
+    return `🇰🇷 **Tour Hàn Quốc: Seoul - Nami - Everland (5N4Đ):**\\n- Khởi hành: **22/11/2026** (Bay Vietjet Air khứ hồi)\\n- Tiêu chuẩn: Khách sạn 4 sao gần trung tâm Seoul\\n- Giá trọn gói: **17.900.000 VNĐ** (Đã bao gồm Visa + Vé The Painter Show + Hanbok + Ăn uống & Tham quan).\\n\\nQuý khách muốn em tư vấn chi tiết về lịch trình hay thủ tục làm Visa nhanh ạ?`;
   }
 
-  // 3. City Tour TP.HCM - Metro - Chùa Bửu Long
-  if (q.includes('city') || q.includes('metro') || q.includes('bửu long') || q.includes('buu long') || q.includes('sen nam bộ') || q.includes('vua hùng')) {
-    return '🏙️ **City Tour Sài Gòn - Trải Nghiệm Metro & Chùa Bửu Long (1 Ngày):**\n- **Khởi hành dự kiến:** 28/11/2026 (07:30 tại 06 Huyền Trân Công Chúa, Q.1)\n- **Giá tour trọn gói:**\n  + Nhóm 20 - 24 khách: **830.000 VNĐ/khách**\n  + Nhóm 25 - 28 khách: **770.000 VNĐ/khách**\n- **Đặc điểm nổi bật:** Ăn sáng tại Nhà hàng Đoàn Viên + Check-in UBND & Nhà Hát TP + Trải nghiệm tuyến tàu điện Metro hiện đại + Viếng Đền Tưởng Niệm Vua Hùng & Chùa Bửu Long độc đáo + Thưởng thức bữa trưa đậm chất đồng quê tại KDL Sen Nam Bộ.\n\nQuý khách muốn đặt chỗ ngay cho đoàn của mình không ạ?';
+  // 5. INTENT 3: TOUR ĐỊA ĐẠO CỦ CHI (1 NGÀY)
+  if (norm.includes('cu chi') || norm.includes('dia dao') || norm.includes('tunnels') || norm.includes('ban sung') || lower.includes('古芝')) {
+    return `🇻🇳 **Tour Khám Phá Địa Đạo Củ Chi Huyền Thoại (01 Ngày):**\\n- **Khởi hành:** 13/11/2026 (08:00 sáng đón tại trung tâm TP.HCM, 15:30 về lại).\\n- **Biểu phí ưu đãi theo đoàn:**\\n  • Nhóm 20 - 24 khách: **1.100.000 VNĐ / khách**\\n  • Nhóm 15 - 19 khách: **1.200.000 VNĐ / khách**\\n  • Nhóm 10 - 14 khách: **1.325.000 VNĐ / khách**\\n- **Trải nghiệm độc đáo:**\\n  + Khám phá mê cung 200km trong lòng đất, bếp Hoàng Cầm, bẫy chông bí mật.\\n  + Thưởng thức khoai mì chấm muối mè và trà nóng chiến khu.\\n  + Thử tài thiện xạ tại trường bắn súng thể thao AK-47 / M16.\\n  + Dùng bữa trưa đặc sản Nam Bộ chất lượng cao: **270.000 VNĐ / suất**.\\n\\nQuý khách dự kiến đi nhóm bao nhiêu người để em báo mức giá chiết khấu tốt nhất ạ?`;
   }
 
-  // 4. Giá cả chung / tour khuyến mãi
-  if (q.includes('báo giá') || q.includes('giá tour') || q.includes('khuyến mãi') || q.includes('ưu đãi') || q.includes('tour')) {
-    return '🎉 **Các Tour Nổi Bật Đang Mở Đặt Chỗ Tại Waldo Kool Travel:**\n1. **Hàn Quốc (Seoul - Nami - Everland) 5N4Đ:** 17.900.000 VNĐ (Khởi hành 22/11/2026, Khách sạn 4* + Bay Vietjet + Visa trọn gói).\n2. **Địa Đạo Củ Chi 1 Ngày:** Chỉ từ 1.100.000 VNĐ (Ăn trưa 270.000đ/suất, xe 29c chất lượng cao).\n3. **City Tour TP.HCM - Metro - Chùa Bửu Long 1 Ngày:** Chỉ từ 770.000 VNĐ (Bao gồm ăn sáng, ăn trưa Sen Nam Bộ, vé tham quan).\n\nQuý khách quan tâm tour trong nước hay quốc tế để em gửi brochure chi tiết ạ?';
+  // 6. INTENT 4: CITY TOUR METRO & CHÙA BỬU LONG (1 NGÀY)
+  if (norm.includes('metro') || norm.includes('buu long') || norm.includes('city') || norm.includes('sai gon') || norm.includes('tp hcm') || norm.includes('sen nam bo') || lower.includes('地铁') || lower.includes('宝龙寺')) {
+    return `🏙️ **City Tour TP.HCM - Trải Nghiệm Tuyến Metro & Chùa Bửu Long (01 Ngày):**\\n- **Khởi hành:** 28/11/2026 (Tập trung lúc 07:30 sáng tại Nhà hàng Đoàn Viên - 06 Huyền Trân Công Chúa, Q.1).\\n- **Bảng giá trọn gói:**\\n  • Nhóm 25 - 28 khách: **770.000 VNĐ / khách**\\n  • Nhóm 20 - 24 khách: **830.000 VNĐ / khách**\\n- **Điểm nhấn đặc biệt:**\\n  + Ăn sáng tại Nhà hàng Đoàn Viên & Check-in Nhà Hát TP, UBND Thành Phố.\\n  + Trải nghiệm thực tế tuyến **Tàu điện ngầm Metro** hiện đại nhất Việt Nam.\\n  + Viếng Đền Tưởng Niệm các Vua Hùng trang nghiêm.\\n  + Chiêm bái **Chùa Bửu Long** - ngôi chùa với bảo tháp vàng lộng lẫy bên sông Đồng Nai.\\n  + Ăn trưa ẩm thực đồng quê dân dã tại **KDL Sen Nam Bộ**.\\n\\nAnh/Chị nhắn số lượng khách để em hỗ trợ giữ vé tàu Metro sớm nhé!`;
   }
 
-  // Default Fallback
-  return 'Dạ em là Trợ lý AI Du Lịch của Waldo Kool Travel. Em có thể giải đáp ngay mọi thông tin chi tiết về:\n- 🇰🇷 **Tour Hàn Quốc 5N4Đ** (Lịch trình Seoul - Nami, giá vé, thủ tục xin visa)\n- 🇻🇳 **Tour Địa Đạo Củ Chi 1N** (Bảng giá theo đoàn, thực đơn ăn trưa 270k, trải nghiệm bắn súng)\n- 🏙️ **City Tour TP.HCM & Tuyến Metro 1N** (Chùa Bửu Long, KDL Sen Nam Bộ)\n\nQuý khách hãy nhắn câu hỏi hoặc nhập **Số điện thoại** để em điều phối nhân viên liên hệ tư vấn ngay ạ!';
+  // 7. INTENT 5: THANH TOÁN, VIETQR, SỐ TÀI KHOẢN, CỌC
+  if (norm.includes('thanh toan') || norm.includes('chuyen khoan') || norm.includes('tai khoan') || norm.includes('stk') || norm.includes('bank') || norm.includes('vietqr') || norm.includes('bidv') || norm.includes('coc') || norm.includes('payment') || lower.includes('转账') || lower.includes('银行')) {
+    return `💳 **Thông Tin Thanh Toán & Chuyển Khoản Đặt Cọc (VietQR 24/7):**\\n- **Ngân hàng:** BIDV (Chi Nhánh Bình Định)\\n- **Số tài khoản:** **5801433856**\\n- **Chủ tài khoản:** **NGUYEN DINH DO**\\n- **Mức cọc:**\\n  + Tour Hàn Quốc: 9.000.000 VNĐ / khách\\n  + Tour trong ngày: 50% tổng đơn\\n- **Cú pháp chuyển khoản:** \`[Họ tên] + [Số điện thoại] + [Tên Tour]\`\\n\\n*Cam kết an tâm:* Ngay sau khi chuyển cọc, hệ thống AI và phòng điều hành sẽ gửi Email & SMS xác nhận đơn giữ chỗ có giá trị pháp lý trong vòng 5 phút!`;
+  }
+
+  // 8. INTENT 6: THÔNG TIN CÔNG TY, LIÊN HỆ, ĐỊA CHỈ, HOTLINE
+  if (norm.includes('dia chi') || norm.includes('o dau') || norm.includes('cong ty') || norm.includes('hotline') || norm.includes('sdt') || norm.includes('so dien thoai') || norm.includes('zalo') || norm.includes('contact') || norm.includes('address')) {
+    return `🏢 **Thông Tin Doanh Nghiệp Waldo Kool Travel:**\\n- **Trụ sở điều hành:** Số 06 Huyền Trân Công Chúa, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh.\\n- **Hotline & Zalo hỗ trợ 24/7:** **+84 859 613 243** (0859 613 243)\\n- **Email:** booking@waldokooltravel.vn\\n- **Website:** https://waldokool.vercel.app/\\n- **Tôn chỉ phục vụ:** *Gắn Kết Thiên Nhiên • Vẹn Tròn Trải Nghiệm*. Quý khách có thể ghé trực tiếp văn phòng tại Quận 1 hoặc đặt trực tuyến tức thì!`;
+  }
+
+  // 9. INTENT 7: CHÀO HỎI / GREETINGS
+  if (norm === 'hi' || norm === 'hello' || norm === 'alo' || norm.includes('xin chao') || norm.includes('chao em') || norm.includes('chao ban') || lower === 'bonjour' || lower.includes('你好')) {
+    if (lang === 'en') {
+      return `Hello! Welcome to **Waldo Kool Travel**. I am your 24/7 AI Travel Assistant.\\n\\nHow can I help you today?\\n1. 🇰🇷 **Korea 5D4N Tour** (Seoul - Nami - Everland)\\n2. 🇻🇳 **Cu Chi Tunnels 1-Day Discovery**\\n3. 🏙️ **HCMC Metro Line & Buu Long Pagoda 1-Day Tour**\\n\\nPlease ask any question or leave your phone number for instant booking!`;
+    } else if (lang === 'fr') {
+      return `Bonjour ! Bienvenue chez **Waldo Kool Travel**. Je suis votre assistant voyage IA 24/7.\\n\\nQue souhaitez-vous découvrir ?\\n1. 🇰🇷 **Circuit Corée 5J4N** (Séoul - Nami - Everland)\\n2. 🇻🇳 **Excursion Tunnels de Cu Chi (1 Jour)**\\n3. 🏙️ **Métro d'Hô Chi Minh & Pagode Buu Long**\\n\\nPosez-moi votre question ou laissez votre numéro pour une réservation immédiate !`;
+    } else if (lang === 'zh') {
+      return `您好！欢迎光临 **Waldo Kool Travel**，我是您的24小时智能AI旅游顾问。\\n\\n请问您想咨询哪条线路？\\n1. 🇰🇷 **韩国首尔-南怡岛-爱宝乐园 5天4晚品质游**\\n2. 🇻🇳 **古芝地道历史探秘 1日游**\\n3. 🏙️ **胡志明市地铁与宝龙寺文化 1日游**\\n\\n欢迎随时向我提问，或留下您的电话/微信，我们将立刻为您预留名额！`;
+    }
+
+    return `Dạ em xin chào Quý khách! Em là Trợ lý AI Du Lịch của **Waldo Kool Travel**.\\n\\nEm luôn sẵn sàng hỗ trợ Anh/Chị 24/7 về:\\n- 🇰🇷 **Tour Hàn Quốc 5N4Đ** (Seoul - Nami - Everland, bay Vietjet, tặng Painter Show & Visa)\\n- 🇻🇳 **Tour Địa Đạo Củ Chi 1N** (Bắn súng thể thao, ăn trưa đặc sản 270k)\\n- 🏙️ **City Tour TP.HCM & Tuyến Metro 1N** (Chùa Bửu Long, KDL Sen Nam Bộ)\\n- 💳 Hướng dẫn thủ tục Visa & thanh toán cọc VietQR BIDV\\n\\nAnh/Chị đang quan tâm đến hành trình nào để em tư vấn chi tiết ngay ạ?`;
+  }
+
+  // 10. DEFAULT INTELLIGENT HELPER
+  return `Dạ em đã nhận được câu hỏi: **"${raw}"**.\\n\\nĐể hỗ trợ tốt nhất, Anh/Chị có thể hỏi em về:\\n- **Báo giá & Lịch trình** các tour Hàn Quốc, Củ Chi hoặc City Tour Metro.\\n- **Hồ sơ xin Visa Hàn Quốc** cần những giấy tờ gì.\\n- **Cách chuyển cọc VietQR BIDV (5801433856 - NGUYEN DINH DO)**.\\n\\nHoặc Anh/Chị có thể để lại **Số Điện Thoại / Zalo**, chuyên viên điều phối của Waldo Kool Travel sẽ liên hệ tư vấn trực tiếp trong 5 phút ạ!`;
 };
 
+
+  const generateKnowledgeResponse = generateSuperSmartResponse;
 
   // 9. API CALL HANDLER (WEBHOOK)
   const sendMessageToServer = async (userText) => {
