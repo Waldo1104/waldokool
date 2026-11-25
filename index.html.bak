@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nền Tảng AI Agentic & Điều Phối Đặt Chỗ Tự Động | Du Lịch & Dịch Vụ</title>
+  <meta name="description" content="Tối ưu hóa tỷ lệ chuyển đổi, loại bỏ 60% lead rơi rớt ngoài giờ với Trợ lý AI chuyên sâu RAG và Bộ điều phối đặt chỗ tự động 24/7.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Tailwind Custom Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            background: {
+              primary: '#0F172A',
+              secondary: '#1E293B',
+              tertiary: '#334155',
+            },
+            accent: {
+              electric: '#2563EB',
+              indigo: '#4F46E5',
+              cyan: '#06B6D4',
+            },
+            status: {
+              success: '#10B981',
+              warning: '#F59E0B',
+              danger: '#EF4444',
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 4s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Glow & Scrollbar Styles */
+    ::selection {
+      background-color: #2563EB;
+      color: #FFFFFF;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0F172A;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #38BDF8 0%, #2563EB 50%, #818CF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glow-border {
+      box-shadow: 0 0 25px -5px rgba(37, 99, 235, 0.25);
+    }
+    .glow-card:hover {
+      box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.25), 0 0 0 1px rgba(6, 182, 212, 0.35);
+    }
+    .typing-cursor::after {
+      content: '|';
+      animation: blink 1s infinite;
+      color: #06B6D4;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+
+<body class="bg-[#0F172A] text-slate-100 font-sans antialiased selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
+
+  <!-- Ambient Light Effect -->
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-blue-600/15 via-indigo-600/10 to-transparent blur-[140px] pointer-events-none -z-10"></div>
+
+  <!-- ==================== 1. NAVIGATION BAR ==================== -->
+  <header class="sticky top-0 z-50 w-full border-b border-slate-800/80 bg-[#0F172A]/80 backdrop-blur-xl transition-all duration-300">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 p-[1.5px] shadow-lg shadow-blue-500/20 group-hover:shadow-cyan-500/30 transition-all">
+          <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+            <i data-lucide="sparkles" class="w-5 h-5 text-cyan-400"></i>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-lg font-extrabold tracking-tight text-white flex items-center gap-1">
+            TourFlow <span class="text-cyan-400 font-mono text-xs px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-800/50">AI 2.0</span>
+          </span>
+          <span class="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Agentic Booking Engine</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#tour-noi-bat" class="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>Tour Trọng Điểm</a>
+        <a href="#thanh-toan-lien-he" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Thanh toán & Liên hệ</a>
+        <a href="#tinh-nang" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Tính năng lõi</a>
+        <a href="#so-sanh" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Hiệu quả</a>
+        <a href="#bang-gia" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Bảng giá</a>
+        <a href="#faqs" class="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors">Giải đáp</a>
+      </nav>
+
+      <!-- CTA Button Group Desktop -->
+      <div class="hidden md:flex items-center gap-4">
+        <a href="admin.html" class="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-white px-3 py-2 transition-colors border border-cyan-500/30 rounded-lg hover:bg-cyan-500/10"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin Portal</a>
+        <a href="#dang-ky" class="relative group inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold text-white transition-all duration-300 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-500 hover:to-indigo-500 shadow-md shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5">
+          <span>Dùng thử 14 ngày</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-1 transition-transform"></i>
+        </a>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none" aria-label="Toggle Menu">
+        <i data-lucide="menu" id="menu-icon" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-b border-slate-800 bg-slate-900/95 backdrop-blur-2xl px-6 py-6 transition-all">
+      <div class="flex flex-col gap-4">
+        <a href="#tinh-nang" class="text-base font-medium text-slate-200 hover:text-cyan-400 mobile-nav-link">Tính năng lõi</a>
+        <a href="#so-sanh" class="text-base font-medium text-slate-200 hover:text-cyan-400 mobile-nav-link">Hiệu quả</a>
+        <a href="#bang-gia" class="text-base font-medium text-slate-200 hover:text-cyan-400 mobile-nav-link">Bảng giá</a>
+        <a href="#tour-noi-bat" class="text-base font-medium text-cyan-400 mobile-nav-link">Tour Trọng Điểm</a>
+        <a href="#thanh-toan-lien-he" class="text-base font-medium text-slate-200 hover:text-cyan-400 mobile-nav-link">Thanh toán & Liên hệ</a>
+        <a href="#faqs" class="text-base font-medium text-slate-200 hover:text-cyan-400 mobile-nav-link">Giải đáp</a>
+        <a href="admin.html" class="text-base font-medium text-cyan-400 hover:text-white mobile-nav-link flex items-center gap-1.5"><i data-lucide="shield" class="w-4 h-4"></i> Trang Quản Trị (Admin Portal)</a>
+        <div class="pt-4 border-t border-slate-800 flex flex-col gap-3">
+          <a href="#dang-ky" class="w-full text-center py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-600/30 mobile-nav-link">Dùng thử 14 ngày miễn phí</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 2. HERO SECTION ==================== -->
+  <section class="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        
+        <!-- Left Column: Copywriting & CTAs (55% ~ 7 cols) -->
+        <div class="lg:col-span-7 flex flex-col items-start text-left">
+          
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 backdrop-blur-md mb-6 hover:border-blue-400/50 transition-all">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span class="text-xs font-semibold text-slate-200 tracking-wide">
+              Công nghệ AI Agentic 2026 — Sẵn sàng phục vụ
+            </span>
+          </div>
+
+          <!-- Headline H1 -->
+          <h1 class="text-3xl sm:text-4xl lg:text-[52px] font-extrabold text-white leading-[1.15] tracking-tight mb-6">
+            Nhân đôi doanh số tour và phòng: <br>
+            <span class="text-gradient">Phản hồi tức thì 24/7, không bỏ lỡ khách.</span>
+          </h1>
+
+          <!-- Sub-headline H2 -->
+          <p class="text-base sm:text-lg text-slate-300/90 leading-relaxed max-w-2xl mb-8">
+            Tạm biệt cảnh mất 60% khách hàng tiềm năng ngoài giờ hành chính. Nền tảng tự động học bảng giá, tư vấn lịch trình chuẩn xác trong 0.8 giây và điều phối đơn giữ chỗ trực tiếp tới đối tác vận hành.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto mb-10">
+            <a href="#dang-ky" class="flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-xl shadow-xl shadow-blue-600/35 hover:shadow-blue-600/55 hover:-translate-y-0.5 active:translate-y-0 transition-all">
+              <span>Trải nghiệm thử AI miễn phí</span>
+              <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
+            </a>
+            <a href="#interactive-demo" class="flex items-center justify-center gap-2.5 px-6 py-3.5 text-sm font-semibold text-slate-200 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 rounded-xl transition-all">
+              <i data-lucide="play-circle" class="w-4 h-4 text-cyan-400"></i>
+              <span>Xem video mô phỏng (2p)</span>
+            </a>
+          </div>
+
+          <!-- Micro Proof Banner -->
+          <div class="grid grid-cols-3 gap-6 pt-8 border-t border-slate-800/80 w-full max-w-lg">
+            <div>
+              <div class="text-2xl lg:text-3xl font-extrabold text-white font-mono tracking-tight">&lt; 0.8s</div>
+              <div class="text-xs text-slate-400 mt-1 font-medium">Tốc độ phản hồi</div>
+            </div>
+            <div>
+              <div class="text-2xl lg:text-3xl font-extrabold text-white font-mono tracking-tight">85%</div>
+              <div class="text-xs text-slate-400 mt-1 font-medium">Tự động hóa tác vụ</div>
+            </div>
+            <div>
+              <div class="text-2xl lg:text-3xl font-extrabold text-cyan-400 font-mono tracking-tight">+3.2x</div>
+              <div class="text-xs text-slate-400 mt-1 font-medium">Tăng chuyển đổi Lead</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Interactive Chat Preview (45% ~ 5 cols) -->
+        <div id="interactive-demo" class="lg:col-span-5 relative">
+          
+          <!-- Outer Decorative Glow -->
+          <div class="absolute -inset-1.5 bg-gradient-to-r from-cyan-500/20 via-blue-600/30 to-indigo-600/20 rounded-2xl blur-xl opacity-75"></div>
+
+          <!-- Mac/Browser Mockup Card -->
+          <div class="relative rounded-2xl border border-slate-700/70 bg-slate-900/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+            
+            <!-- Window Control Header -->
+            <div class="flex items-center justify-between px-4 py-3 bg-slate-950/70 border-b border-slate-800">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-rose-500/90"></div>
+                <div class="w-3 h-3 rounded-full bg-amber-500/90"></div>
+                <div class="w-3 h-3 rounded-full bg-emerald-500/90"></div>
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>agent-travel-dispatcher.v2</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[11px] text-emerald-400 font-mono">Active</span>
+              </div>
+            </div>
+
+            <!-- Chat Content Container -->
+            <div class="p-4 sm:p-5 flex flex-col gap-4 text-xs sm:text-sm min-h-[440px] justify-between">
+              
+              <div class="flex flex-col gap-3.5">
+                
+                <!-- Message 1: Visitor / User -->
+                <div class="flex justify-end items-start gap-2.5">
+                  <div class="max-w-[85%] rounded-2xl rounded-tr-sm bg-blue-600 px-4 py-3 text-white shadow-md">
+                    <p class="leading-relaxed">
+                      Tôi muốn tìm tour trọn gói Đà Nẵng 3 ngày 2 đêm cho 4 người lớn, ngân sách tầm 4 triệu/người, có xe đưa đón sân bay.
+                    </p>
+                    <div class="text-[10px] text-blue-200 mt-1 text-right font-mono">22:45 (Ngoài giờ)</div>
+                  </div>
+                  <div class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center shrink-0 text-slate-300 font-bold text-xs">
+                    KH
+                  </div>
+                </div>
+
+                <!-- Message 2: System Processing Indicator -->
+                <div id="ai-processing-status" class="flex items-center gap-2 text-cyan-400 py-1 px-3 bg-cyan-950/40 border border-cyan-800/40 rounded-lg w-fit text-xs font-mono">
+                  <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
+                  <span>Đang tra cứu kho dữ liệu 1.000 tour & check slot trống...</span>
+                </div>
+
+                <!-- Message 3: AI Assistant Reply -->
+                <div id="ai-reply-card" class="flex items-start gap-2.5 transition-all duration-500">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 p-[1.5px] shrink-0 mt-0.5">
+                    <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                      <i data-lucide="bot" class="w-4 h-4 text-cyan-300"></i>
+                    </div>
+                  </div>
+                  <div class="flex-1 rounded-2xl rounded-tl-sm bg-slate-800/90 border border-slate-700/80 p-4 text-slate-200 shadow-md">
+                    <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-700/60">
+                      <span class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                        Tour Đà Nẵng - Hội An - Bà Nà Hills (3N2Đ)
+                      </span>
+                      <span class="text-[11px] font-mono bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">Khớp 99%</span>
+                    </div>
+
+                    <div id="typewriter-text" class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3">
+                      <!-- Dynamic text injected via script -->
+                    </div>
+
+                    <!-- Booking Dispatch Action Preview -->
+                    <div id="booking-actions" class="mt-3 pt-3 border-t border-slate-700/60 flex flex-col gap-2 opacity-0 transition-opacity duration-500">
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-400">Đơn vị vận hành:</span>
+                        <span class="font-semibold text-slate-200">Saigon Heritage Travel</span>
+                      </div>
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-400">Giá trọn gói 4 khách:</span>
+                        <span class="font-bold text-emerald-400 font-mono text-sm">15.400.000 VNĐ</span>
+                      </div>
+                      <button onclick="simulateBookingSuccess(this)" class="mt-2 w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 transition-all">
+                        <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                        <span>Xác nhận giữ 4 chỗ ngay (Giữ trong 15p)</span>
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Input Simulator Bar -->
+              <div class="pt-3 border-t border-slate-800 flex items-center gap-2">
+                <div class="flex-1 bg-slate-950/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-400 border border-slate-800 flex items-center justify-between">
+                  <span>Nhập câu hỏi hoặc yêu cầu thêm dịch vụ...</span>
+                  <i data-lucide="mic" class="w-3.5 h-3.5 text-slate-500"></i>
+                </div>
+                <button class="w-9 h-9 rounded-xl bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shrink-0 transition-colors">
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 3. SOCIAL PROOF & METRICS ==================== -->
+  <section class="py-16 border-y border-slate-800/80 bg-slate-900/40 relative">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Headline & Logos -->
+      <div class="text-center mb-12">
+        <p class="text-xs uppercase tracking-widest font-semibold text-slate-400 mb-6">
+          Được tin dùng bởi hơn 120+ nhà điều hành tour, chuỗi khách sạn và đơn vị du lịch
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14 opacity-75 grayscale hover:grayscale-0 transition-all">
+          <div class="flex items-center gap-2 font-bold text-base md:text-lg text-slate-300">
+            <i data-lucide="compass" class="w-5 h-5 text-cyan-400"></i> Saigon Heritage
+          </div>
+          <div class="flex items-center gap-2 font-bold text-base md:text-lg text-slate-300">
+            <i data-lucide="palmtree" class="w-5 h-5 text-emerald-400"></i> Paradise Bay Resorts
+          </div>
+          <div class="flex items-center gap-2 font-bold text-base md:text-lg text-slate-300">
+            <i data-lucide="ship" class="w-5 h-5 text-blue-400"></i> Mekong Discovery
+          </div>
+          <div class="flex items-center gap-2 font-bold text-base md:text-lg text-slate-300">
+            <i data-lucide="hotel" class="w-5 h-5 text-indigo-400"></i> Emerald Boutique
+          </div>
+          <div class="flex items-center gap-2 font-bold text-base md:text-lg text-slate-300">
+            <i data-lucide="globe-2" class="w-5 h-5 text-amber-400"></i> GoAsia Travel OTA
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics Grid (4 Blocks) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-10 border-t border-slate-800">
+        
+        <div class="p-6 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col items-center text-center">
+          <span class="text-3xl sm:text-4xl font-extrabold text-white font-mono mb-1">1.500.000+</span>
+          <span class="text-xs sm:text-sm font-medium text-slate-400">Lượt chat xử lý tự động / tháng</span>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col items-center text-center">
+          <span class="text-3xl sm:text-4xl font-extrabold text-cyan-400 font-mono mb-1">-65%</span>
+          <span class="text-xs sm:text-sm font-medium text-slate-400">Chi phí nhân sự trực ca đêm</span>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col items-center text-center">
+          <span class="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono mb-1">98.4%</span>
+          <span class="text-xs sm:text-sm font-medium text-slate-400">Độ chuẩn xác bảng giá & phòng</span>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col items-center text-center">
+          <span class="text-3xl sm:text-4xl font-extrabold text-indigo-400 font-mono mb-1">&lt; 48 Giờ</span>
+          <span class="text-xs sm:text-sm font-medium text-slate-400">Thời gian triển khai & huấn luyện</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+    <!-- ==================== TOURS & DESTINATIONS SHOWCASE ==================== -->
+  <section id="tour-noi-bat" class="py-24 relative bg-slate-900/50 border-t border-slate-800/80">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-4">
+          <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+          Dữ Liệu Khởi Hành Thực Tế & Đặt Chỗ Ngay
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-4">
+          Hành Trình Du Lịch Trọng Điểm & <span class="text-gradient">Trải Nghiệm Khác Biệt</span>
+        </h2>
+        <p class="text-slate-400 text-base sm:text-lg leading-relaxed">
+          Tích hợp dữ liệu độc quyền từ VietJourneys: từ thủ đô Seoul ngập tràn sắc hoa và nghệ thuật, đến huyền thoại Địa Đạo Củ Chi và nhịp sống đô thị Metro TP.HCM hiện đại.
+        </p>
+      </div>
+
+      <!-- Tours Cards Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- CARD 1: TOUR HÀN QUỐC -->
+        <div class="group bg-slate-900/90 rounded-2xl border border-slate-800 hover:border-cyan-500/50 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10 hover:-translate-y-1">
+          <!-- Card Image & Badges -->
+          <div class="relative h-56 overflow-hidden">
+            <img src="assets/tours/korea-hero.png" alt="Tour Hàn Quốc Seoul Nami Everland" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+            <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+              <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-600/90 text-white shadow">5 Ngày 4 Đêm</span>
+              <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-500/90 text-slate-950">Khách sạn 4★</span>
+            </div>
+            <div class="absolute top-3 right-3">
+              <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900/90 text-cyan-400 border border-cyan-500/30">Bay Vietjet Air</span>
+            </div>
+            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-300">
+              <span class="flex items-center gap-1 font-mono text-cyan-300"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> KH: 22/11/2026</span>
+              <span class="text-emerald-400 font-semibold flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Bao gồm Visa</span>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase tracking-wider font-semibold text-cyan-400 mb-1">Du Lịch Quốc Tế Cao Cấp</div>
+              <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                SEOUL – NAMI – EVERLAND
+              </h3>
+              <p class="text-xs text-slate-400 mb-4 line-clamp-2">
+                Hành trình mùa thu đông rực rỡ ngắm lá vàng đảo Nami, tháp Namsan biểu tượng tình yêu, công viên Everland và di sản hoàng gia Cung Cảnh Phúc.
+              </p>
+
+              <!-- Highlights Tags -->
+              <div class="space-y-2 mb-5">
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="gift" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                  <span>Tặng vé thưởng thức <strong class="text-white">Painter Show</strong> danh tiếng</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400 shrink-0 mt-0.5"></i>
+                  <span>Trải nghiệm mặc <strong class="text-white">Hanbok</strong> truyền thống & tự tay làm Kimchi</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="utensils" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <span>Ẩm thực chuẩn Hàn: Lẩu nấm, Gà nướng, Buffet nướng, Canh sườn</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price & Actions -->
+            <div class="pt-4 border-t border-slate-800">
+              <div class="flex items-baseline justify-between mb-4">
+                <div>
+                  <span class="text-xs text-slate-400 block">Giá trọn gói trọn vẹn</span>
+                  <span class="text-2xl font-black text-white font-mono">17.900.000<span class="text-sm font-sans text-cyan-400 font-bold ml-1">VNĐ</span></span>
+                </div>
+                <span class="text-xs text-slate-400 text-right">Trẻ em: 16.500.000đ<br>Em bé: 5.900.000đ</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="openTourModal('korea')" class="px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white border border-slate-700 transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Xem Lịch Trình
+                </button>
+                <button onclick="triggerTourBooking('Tour Hàn Quốc Seoul - Nami - Everland (5N4Đ)', '17.900.000 VNĐ', '22/11/2026')" class="px-3 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i> Đặt Chỗ Ngay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: TOUR ĐỊA ĐẠO CỦ CHI -->
+        <div class="group bg-slate-900/90 rounded-2xl border border-slate-800 hover:border-emerald-500/50 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1">
+          <!-- Card Image & Badges -->
+          <div class="relative h-56 overflow-hidden">
+            <img src="assets/tours/cuchi-tunnels.jpeg" alt="Tour Địa Đạo Củ Chi 1 Ngày" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+            <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+              <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-600/90 text-white shadow">1 Ngày (01 Day)</span>
+              <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-800 text-slate-200">Xe du lịch 29C</span>
+            </div>
+            <div class="absolute top-3 right-3">
+              <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900/90 text-emerald-400 border border-emerald-500/30">Bao Gồm Ăn Trưa</span>
+            </div>
+            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-300">
+              <span class="flex items-center gap-1 font-mono text-emerald-300"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> KH: 13/11/2026</span>
+              <span class="text-cyan-400 font-semibold flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Khởi hành 08:00 AM</span>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase tracking-wider font-semibold text-emerald-400 mb-1">Du Lịch Di Sản & Lịch Sử Hào Hùng</div>
+              <h3 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+                ĐỊA ĐẠO CỦ CHI HUYỀN THOẠI
+              </h3>
+              <p class="text-xs text-slate-400 mb-4 line-clamp-2">
+                Hệ thống địa đạo dài hơn 200km trong lòng đất, bếp Hoàng Cầm huyền thoại, thưởng thức khoai mì muối mè chiến khu và thử tài thiện xạ súng thể thao.
+              </p>
+
+              <!-- Highlights Tags -->
+              <div class="space-y-2 mb-5">
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <span>Khám phá mê cung ngầm, hầm chông & lối thoát hiểm bí mật</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="coffee" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                  <span>Thưởng thức khoai mì chấm muối mè & ấm trà nóng thơm bùi</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="utensils" class="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5"></i>
+                  <span>Ăn trưa ẩm thực Nam Bộ chuẩn vị: <strong class="text-white">270.000 VNĐ/suất</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price & Actions -->
+            <div class="pt-4 border-t border-slate-800">
+              <div class="flex items-baseline justify-between mb-4">
+                <div>
+                  <span class="text-xs text-slate-400 block">Giá trọn gói ưu đãi đoàn</span>
+                  <span class="text-2xl font-black text-white font-mono">1.100.000<span class="text-sm font-sans text-emerald-400 font-bold ml-1">VNĐ</span></span>
+                </div>
+                <span class="text-xs text-slate-400 text-right">Đoàn 15-19: 1.200.000đ<br>Đoàn 10-14: 1.325.000đ</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="openTourModal('cuchi')" class="px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white border border-slate-700 transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Xem Lịch Trình
+                </button>
+                <button onclick="triggerTourBooking('Tour Địa Đạo Củ Chi (1 Ngày)', 'Từ 1.100.000 VNĐ', '13/11/2026')" class="px-3 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i> Đặt Chỗ Ngay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3: CITY TOUR TP.HCM - METRO - CHÙA BỬU LONG -->
+        <div class="group bg-slate-900/90 rounded-2xl border border-slate-800 hover:border-purple-500/50 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-1">
+          <!-- Card Image & Badges -->
+          <div class="relative h-56 overflow-hidden">
+            <img src="assets/tours/city-buulong.jpeg" alt="City Tour TP.HCM Metro Chùa Bửu Long" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+            <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+              <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-purple-600/90 text-white shadow">1 Ngày (01 Day)</span>
+              <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-500/90 text-white">Trải Nghiệm Metro</span>
+            </div>
+            <div class="absolute top-3 right-3">
+              <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900/90 text-purple-300 border border-purple-500/30">Ăn Sáng + Trưa</span>
+            </div>
+            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-300">
+              <span class="flex items-center gap-1 font-mono text-purple-300"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> KH: 28/11/2026</span>
+              <span class="text-cyan-400 font-semibold flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Khởi hành 07:30 AM</span>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-xs uppercase tracking-wider font-semibold text-purple-400 mb-1">Du Lịch Đô Thị & Tâm Linh Thanh Tịnh</div>
+              <h3 class="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
+                METRO TP.HCM & CHÙA BỬU LONG
+              </h3>
+              <p class="text-xs text-slate-400 mb-4 line-clamp-2">
+                Trải nghiệm hiện đại trên tuyến metro ngầm, viếng Đền Tưởng Niệm Vua Hùng, chiêm ngưỡng kiến trúc tráng lệ Chùa Bửu Long và ẩm thực đồng quê Sen Nam Bộ.
+              </p>
+
+              <!-- Highlights Tags -->
+              <div class="space-y-2 mb-5">
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="train" class="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5"></i>
+                  <span>Trải nghiệm tuyến <strong class="text-white">Tàu điện Metro ngầm</strong> tiên tiến</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="landmark" class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5"></i>
+                  <span>Chiêm bái <strong class="text-white">Chùa Bửu Long</strong> - tuyệt tác Phật giáo nguy nga</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-slate-300">
+                  <i data-lucide="utensils" class="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5"></i>
+                  <span>Bữa trưa đặc sản mộc mạc tại <strong class="text-white">KDL Sen Nam Bộ</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price & Actions -->
+            <div class="pt-4 border-t border-slate-800">
+              <div class="flex items-baseline justify-between mb-4">
+                <div>
+                  <span class="text-xs text-slate-400 block">Giá trọn gói ưu đãi đoàn</span>
+                  <span class="text-2xl font-black text-white font-mono">770.000<span class="text-sm font-sans text-purple-400 font-bold ml-1">VNĐ</span></span>
+                </div>
+                <span class="text-xs text-slate-400 text-right">Đoàn 20-24: 830.000đ<br>Đoàn 25-28: 770.000đ</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="openTourModal('citytour')" class="px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white border border-slate-700 transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Xem Lịch Trình
+                </button>
+                <button onclick="triggerTourBooking('City Tour TP.HCM - Metro - Chùa Bửu Long (1 Ngày)', 'Từ 770.000 VNĐ', '28/11/2026')" class="px-3 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-600/30 transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i> Đặt Chỗ Ngay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Live Experience Banner -->
+      <div class="mt-12 bg-gradient-to-r from-slate-900 via-slate-800/80 to-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0">
+            <i data-lucide="sparkles" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h4 class="text-white font-bold text-sm sm:text-base">Bạn cần thiết kế tour riêng cho đoàn hoặc tư vấn thủ tục Visa?</h4>
+            <p class="text-slate-400 text-xs sm:text-sm">Trợ lý AI Agentic TourFlow sẵn sàng phân tích ngân sách và điều phối lịch trình tức thì 24/7.</p>
+          </div>
+        </div>
+        <button onclick="if(window.TourFlowChat){window.TourFlowChat.toggleWindow(true); window.TourFlowChat.sendMessage('Em muốn tư vấn tour riêng cho đoàn');}" class="whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+          <i data-lucide="message-square" class="w-4 h-4"></i> Trò Chuyện Cùng AI
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== TOUR DETAILS MODAL POPUP ==================== -->
+  <div id="tour-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative">
+      <!-- Modal Header -->
+      <div class="p-6 border-b border-slate-800 flex items-start justify-between bg-slate-950/60">
+        <div>
+          <span id="modal-category" class="text-xs uppercase font-bold text-cyan-400 tracking-wider">Chi Tiết Chương Trình</span>
+          <h3 id="modal-title" class="text-xl sm:text-2xl font-extrabold text-white mt-1">Tên Tour</h3>
+          <p id="modal-subtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Thông tin chi tiết hành trình & biểu phí</p>
+        </div>
+        <button onclick="closeTourModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div id="modal-content" class="p-6 overflow-y-auto space-y-6 text-slate-300 text-sm leading-relaxed">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between gap-4">
+        <div id="modal-price" class="text-lg font-black text-white font-mono">
+          <!-- Price Injected -->
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="closeTourModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">
+            Đóng
+          </button>
+          <button id="modal-book-btn" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-lg shadow-cyan-500/25 transition flex items-center gap-1.5">
+            <i data-lucide="calendar-check" class="w-4 h-4"></i> Giữ Chỗ Tour Này
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== 4. CORE FEATURES (BENTO GRID) ==================== -->
+  <section id="tinh-nang" class="py-24 relative">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/50 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-4">
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+          Đột Phá Công Nghệ AI
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+          Bộ Ba Tính Năng Độc Quyền Xóa Bỏ Điểm Nghẽn Vận Hành
+        </h2>
+        <p class="text-slate-400 text-base leading-relaxed">
+          Tối ưu hóa từng điểm chạm trong hành trình khách hàng: từ lúc hỏi giá lúc nửa đêm đến khi lệnh điều phối được đẩy thẳng đến đối tác địa phương.
+        </p>
+      </div>
+
+      <!-- 3 Feature Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Card 1: RAG Engine -->
+        <div class="group p-8 rounded-2xl bg-slate-800/50 border border-slate-700/60 hover:border-cyan-500/50 transition-all duration-300 flex flex-col justify-between glow-card">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="database" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-mono text-cyan-400 font-semibold tracking-wide uppercase mb-2">RAG Engine Chuyên Sâu</div>
+            <h3 class="text-xl font-bold text-white mb-3 leading-snug">Học Sâu Kho Dữ Liệu Riêng Biệt (Zero Hallucination)</h3>
+            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+              Đọc hiểu và liên kết toàn bộ tài liệu PDF chính sách tour, Excel bảng giá mùa vụ và quy định phụ thu. AI chỉ trả lời đúng dữ liệu đã kiểm duyệt, tuyệt đối không bịa thông tin.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1 text-emerald-400 font-medium">
+              <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Chống nhầm giá 100%
+            </span>
+            <span class="font-mono text-slate-500">Support PDF/XLS/Docs</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Intent & Dynamic Itinerary -->
+        <div class="group p-8 rounded-2xl bg-slate-800/50 border border-slate-700/60 hover:border-blue-500/50 transition-all duration-300 flex flex-col justify-between glow-card">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="route" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-mono text-blue-400 font-semibold tracking-wide uppercase mb-2">Intent Recognition</div>
+            <h3 class="text-xl font-bold text-white mb-3 leading-snug">Xây Dựng Lịch Trình Động Theo Ngân Sách</h3>
+            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+              Phân tích mục đích du lịch (gia đình, cặp đôi, đoàn công tác), tự động khớp ngân sách và gợi ý gói khách sạn, điểm tham quan tối ưu nhất trong vòng chưa đầy 1 giây.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1 text-cyan-400 font-medium">
+              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Tăng 28% giá trị đơn (AOV)
+            </span>
+            <span class="font-mono text-slate-500">Smart Upselling</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Automated Dispatcher -->
+        <div class="group p-8 rounded-2xl bg-slate-800/50 border border-slate-700/60 hover:border-indigo-500/50 transition-all duration-300 flex flex-col justify-between glow-card">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="send-to-back" class="w-6 h-6"></i>
+            </div>
+            <div class="text-xs font-mono text-indigo-400 font-semibold tracking-wide uppercase mb-2">Instant Dispatcher</div>
+            <h3 class="text-xl font-bold text-white mb-3 leading-snug">Điều Phối Giữ Chỗ & Đồng Bộ Đa Kênh Tự Động</h3>
+            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+              Khi khách chốt tour, AI tự trích xuất thông tin, kiểm tra hạn chỗ và đẩy ngay lệnh đặt chỗ qua Zalo OA, Email hoặc API Webhook trực tiếp tới đội xe và đối tác lưu trú.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1 text-emerald-400 font-medium">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i> Giảm từ 45p xuống 5s
+            </span>
+            <span class="font-mono text-slate-500">Webhook & Zalo OA</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 5. BEFORE VS. AFTER COMPARISON ==================== -->
+  <section id="so-sanh" class="py-20 bg-slate-900/60 border-y border-slate-800/80">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 class="text-3xl font-extrabold text-white tracking-tight mb-3">
+          Sự Khác Biệt Khi Ứng Dụng TourFlow AI
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          So sánh trực quan giữa phương thức trực tổng đài thủ công và mô hình AI tự hành.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Old Manual Way -->
+        <div class="p-8 rounded-2xl bg-rose-950/10 border border-rose-900/30 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+                <i data-lucide="x-circle" class="w-5 h-5"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">Mô Hình Thủ Công Truyền Thống</h3>
+            </div>
+            
+            <ul class="space-y-4 text-sm text-slate-300">
+              <li class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0 mt-0.5"></i>
+                <span><strong>Rơi rớt 60% lead ngoài giờ:</strong> Khách nhắn tin sau 18h hoặc nửa đêm phải đợi đến sáng hôm sau mới có người trả lời.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0 mt-0.5"></i>
+                <span><strong>Sai sót thông tin:</strong> Nhân sự mới thường xuyên tư vấn nhầm giá mùa vụ, quên điều kiện phụ thu trẻ em.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0 mt-0.5"></i>
+                <span><strong>Điều phối chậm 30 - 60 phút:</strong> Phải gọi điện, nhắn Zalo thủ công cho từng nhà xe, khách sạn để kiểm tra phòng trống.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0 mt-0.5"></i>
+                <span><strong>Chi phí phình to:</strong> Tốn ngân sách lớn tuyển dụng và đào tạo nhân sự trực tổng đài luân phiên ca đêm.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="mt-8 pt-4 border-t border-rose-900/20 text-xs font-mono text-rose-400">
+            Kết quả: Mất khách vào tay đối thủ, chi phí cố định cao.
+          </div>
+        </div>
+
+        <!-- New AI-Driven Way -->
+        <div class="p-8 rounded-2xl bg-emerald-950/20 border border-emerald-500/40 relative glow-border flex flex-col justify-between">
+          <div class="absolute -top-3.5 right-6 px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-xs font-extrabold rounded-full uppercase tracking-wider">
+            Đột Phá 2026
+          </div>
+
+          <div>
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <i data-lucide="check-check" class="w-5 h-5"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">Mô Hình Tự Động Hóa Với TourFlow AI</h3>
+            </div>
+            
+            <ul class="space-y-4 text-sm text-slate-200">
+              <li class="flex items-start gap-3">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><strong>Phản hồi &lt; 0.8 giây 24/7/365:</strong> Khách hỏi lúc 2h sáng vẫn nhận được tư vấn chi tiết và giữ chỗ ngay lập tức.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><strong>Chuẩn xác 98.4%:</strong> AI học thẳng từ file PDF/Excel bảng giá mới nhất, loại bỏ hoàn toàn lỗi con người.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><strong>Điều phối tự động dưới 5 giây:</strong> Gửi thông báo booking lập tức qua Zalo OA, Email hoặc đồng bộ thẳng vào PMS/CRM.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                <span><strong>Tiết kiệm 65% chi phí:</strong> Một trợ lý AI đảm đương khối lượng công việc của cả đội ngũ 8 nhân sự ca đêm.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="mt-8 pt-4 border-t border-emerald-500/20 text-xs font-mono text-emerald-400">
+            Kết quả: Tăng 3.2x tỷ lệ chốt đơn, nhân sự tập trung chăm sóc khách VIP.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 6. PRICING TIERS ==================== -->
+  <section id="bang-gia" class="py-24 relative">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-800/50 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4">
+          <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+          Đầu Tư Hiệu Quả — Rõ Ràng
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+          Bảng Giá Triển Khai Linh Hoạt Theo Quy Mô
+        </h2>
+        <p class="text-slate-400 text-base">
+          Chọn gói phù hợp để bắt đầu tự động hóa quy trình tư vấn và gia tăng doanh số ngay hôm nay.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+        
+        <!-- Starter Tier -->
+        <div class="p-8 rounded-2xl bg-slate-800/40 border border-slate-700/60 flex flex-col justify-between hover:border-slate-600 transition-all">
+          <div>
+            <div class="text-lg font-bold text-white mb-2">Gói Khởi Động (Starter)</div>
+            <p class="text-xs text-slate-400 mb-6">Phù hợp khách sạn đơn lẻ, homestay hoặc đại lý du lịch nhỏ (dưới 5 nhân sự).</p>
+            
+            <div class="flex items-baseline gap-1 mb-6 pb-6 border-b border-slate-700/60">
+              <span class="text-3xl font-extrabold text-white font-mono">1.890.000</span>
+              <span class="text-xs text-slate-400">VNĐ / tháng</span>
+            </div>
+
+            <ul class="space-y-3.5 text-xs text-slate-300 mb-8">
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Tối đa <strong>2.000</strong> lượt hội thoại/tháng</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Tích hợp Website Chat Widget</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Nạp tài liệu PDF, Word (tối đa 50MB)</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Thu thập thông tin Lead gửi về Email & Sheets</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Hỗ trợ kỹ thuật qua Ticket giờ hành chính</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#dang-ky" class="w-full py-3 px-4 text-center text-xs font-bold text-slate-200 bg-slate-700/80 hover:bg-slate-600 rounded-xl transition-all">
+            Chọn gói Khởi Động
+          </a>
+        </div>
+
+        <!-- Professional Tier (Recommended) -->
+        <div class="relative p-8 rounded-2xl bg-slate-800/90 border-2 border-blue-500 shadow-2xl shadow-blue-500/20 flex flex-col justify-between lg:-translate-y-3">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[11px] font-extrabold rounded-full uppercase tracking-wider shadow-md">
+            ★ Lựa Chọn Khuyên Dùng Nhiều Nhất
+          </div>
+
+          <div>
+            <div class="text-lg font-bold text-white mb-2">Gói Doanh Nghiệp (Professional)</div>
+            <p class="text-xs text-slate-300 mb-6">Dành cho nhà điều hành tour, chuỗi khách sạn 3-4 sao và đại lý du lịch OTA.</p>
+            
+            <div class="flex items-baseline gap-1 mb-6 pb-6 border-b border-slate-700">
+              <span class="text-4xl font-extrabold text-white font-mono">4.990.000</span>
+              <span class="text-xs text-slate-300">VNĐ / tháng</span>
+            </div>
+
+            <ul class="space-y-3.5 text-xs text-slate-200 mb-8">
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>Tối đa <strong>10.000</strong> lượt hội thoại/tháng</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span><strong>Không giới hạn</strong> dung lượng tài liệu RAG</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span><strong>Đa kênh:</strong> Website, Zalo OA, Facebook Messenger</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span><strong>Tự động điều phối Booking</strong> qua Webhook & Zalo</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>Gợi ý lịch trình động theo ngân sách khách</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>Báo cáo phân tích hành vi & chuyển đổi chuyên sâu</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#dang-ky" class="w-full py-3.5 px-4 text-center text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl shadow-lg shadow-blue-600/40 transition-all">
+            Bắt đầu trải nghiệm ngay
+          </a>
+        </div>
+
+        <!-- Enterprise Tier -->
+        <div class="p-8 rounded-2xl bg-slate-800/40 border border-slate-700/60 flex flex-col justify-between hover:border-slate-600 transition-all">
+          <div>
+            <div class="text-lg font-bold text-white mb-2">Gói May Đo (Enterprise)</div>
+            <p class="text-xs text-slate-400 mb-6">Dành cho tập đoàn lữ hành lớn, chuỗi resort 5 sao cần bảo mật cao và API chuyên biệt.</p>
+            
+            <div class="flex items-baseline gap-1 mb-6 pb-6 border-b border-slate-700/60">
+              <span class="text-3xl font-extrabold text-white font-mono">May Đo Riêng</span>
+              <span class="text-xs text-slate-400">/ theo giải pháp</span>
+            </div>
+
+            <ul class="space-y-3.5 text-xs text-slate-300 mb-8">
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span><strong>Không giới hạn</strong> lượt hội thoại & băng thông</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Triển khai Private Cloud hoặc On-Premise riêng biệt</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Tích hợp 2 chiều hệ thống ERP / PMS (Opera, Cloudbeds, EzCloud)</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Huấn luyện mô hình AI ngữ điệu thương hiệu độc quyền</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <i data-lucide="check" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+                <span>Cam kết SLA 99.9% Uptime & Kỹ sư hỗ trợ 24/7 riêng biệt</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="#dang-ky" class="w-full py-3 px-4 text-center text-xs font-bold text-slate-200 bg-slate-700/80 hover:bg-slate-600 rounded-xl transition-all">
+            Đặt lịch tư vấn chuyên gia
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 7. FINAL CTA & FAQ ACCORDION ==================== -->
+  
+  <!-- FAQ Section -->
+  <section id="faqs" class="py-20 bg-slate-900/40 border-t border-slate-800">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-extrabold text-white tracking-tight mb-3">
+          Câu Hỏi Thường Gặp
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          Giải đáp các thắc mắc phổ biến nhất về tính bảo mật, triển khai và độ chính xác của AI.
+        </p>
+      </div>
+
+      <!-- Accordion List -->
+      <div class="space-y-4">
+        
+        <!-- Item 1 -->
+        <div class="border border-slate-800 rounded-xl bg-slate-800/30 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-slate-200 hover:text-cyan-400 transition-colors">
+            <span>Dữ liệu kinh doanh và bảng giá mật của chúng tôi có được bảo mật không?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3">
+            Tuyệt đối an toàn. Toàn bộ dữ liệu tài liệu và hội thoại được mã hóa chuẩn doanh nghiệp (AES-256). Chúng tôi cam kết bằng hợp đồng bảo mật (NDA): Dữ liệu của bạn chỉ phục vụ riêng cho doanh nghiệp bạn và <strong>không bao giờ</strong> được sử dụng để đào tạo các mô hình AI công cộng.
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="border border-slate-800 rounded-xl bg-slate-800/30 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-slate-200 hover:text-cyan-400 transition-colors">
+            <span>Thời gian tích hợp vào website và kênh fanpage của chúng tôi mất bao lâu?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3">
+            Chỉ dưới 48 giờ làm việc. Bạn chỉ cần tải tài liệu tour/phòng lên bảng điều khiển và chèn 1 dòng mã nhúng (script) vào website hoặc liên kết quyền quản trị Fanpage/Zalo OA với 2 bước click chuột. Đội ngũ kỹ sư của chúng tôi sẽ đồng hành hỗ trợ cấu hình trọn gói.
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="border border-slate-800 rounded-xl bg-slate-800/30 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-slate-200 hover:text-cyan-400 transition-colors">
+            <span>AI có xảy ra tình trạng "bịa" giá (hallucination) hoặc tư vấn sai chính sách không?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3">
+            Không. Nền tảng ứng dụng cơ chế RAG có hàng rào kiểm soát nghiêm ngặt (Strict Guardrails). AI chỉ được phép trích xuất thông tin có trong tài nguyên bạn đã phê duyệt. Đối với các yêu cầu nằm ngoài phạm vi dữ liệu, AI sẽ lịch sự ghi nhận thông tin và chuyển ngay đến số hotline của tư vấn viên con người.
+          </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="border border-slate-800 rounded-xl bg-slate-800/30 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-slate-200 hover:text-cyan-400 transition-colors">
+            <span>Hệ thống có kết nối được với phần mềm quản lý phòng (PMS) hoặc CRM hiện tại không?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3">
+            Có. Nền tảng hỗ trợ sẵn cổng kết nối Webhook, Zapier, Make và hệ thống Open API linh hoạt. Dễ dàng đẩy dữ liệu khách và booking sang các hệ thống quen thuộc như HubSpot, Zoho, Google Sheets, phần mềm quản lý khách sạn (Cloudbeds, EzCloud) hoặc hệ thống vận hành nội bộ của bạn.
+          </div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="border border-slate-800 rounded-xl bg-slate-800/30 overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-slate-200 hover:text-cyan-400 transition-colors">
+            <span>Nếu khách hàng nói tiếng nước ngoài (Anh, Hàn, Trung, Pháp...), AI có hỗ trợ tốt không?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content hidden px-5 pb-5 text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3">
+            Hoàn toàn tự động. AI sở hữu khả năng dịch thuật và xử lý ngôn ngữ tự nhiên trên hơn 95 ngôn ngữ. Khách hàng hỏi bằng tiếng Hàn, hệ thống sẽ tự động đọc dữ liệu tiếng Việt của bạn và phản hồi lại bằng tiếng Hàn chuẩn mực theo phong cách bản địa.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Final CTA Box & Registration Form Section -->
+  <section id="dang-ky" class="py-24 relative overflow-hidden">
+    <div class="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 relative">
+      
+      <div class="p-8 sm:p-14 rounded-3xl bg-gradient-to-br from-blue-900/40 via-slate-900 to-indigo-950/40 border border-blue-500/30 shadow-2xl relative overflow-hidden text-center">
+        
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-2xl mx-auto">
+          <span class="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-cyan-300 text-xs font-bold tracking-wider uppercase mb-4">
+            Đừng để thêm một lead nào rơi rớt đêm nay
+          </span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+            Sẵn Sàng Nhân Đôi Doanh Số Đặt Chỗ?
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-8">
+            Bắt đầu dùng thử miễn phí 14 ngày. Không yêu cầu thẻ tín dụng. Hỗ trợ cấu hình kho dữ liệu và cài đặt trọn gói trong 48 giờ.
+          </p>
+
+          <!-- Form Sign-Up -->
+          <form onsubmit="handleFormSubmit(event)" class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto mb-6">
+            <input type="email" required placeholder="Nhập email doanh nghiệp của bạn..." class="flex-1 px-4 py-3.5 rounded-xl bg-slate-950/80 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-400">
+            <button type="submit" class="px-6 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 font-bold text-white text-sm rounded-xl shadow-lg shadow-blue-600/40 transition-all shrink-0">
+              Đăng Ký Miễn Phí
+            </button>
+          </form>
+
+          <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i> Miễn phí 14 ngày
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="credit-card" class="w-4 h-4 text-emerald-400"></i> Không cần thẻ tín dụng
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> Hoàn tiền trong 30 ngày
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 8. FOOTER ==================== -->
+    <!-- ==================== PAYMENT & CONTACT & SOCIAL SECTION ==================== -->
+  <section id="thanh-toan-lien-he" class="py-24 relative bg-slate-950 border-t border-slate-800">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 mb-4">
+          <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+          Thanh Toán Linh Hoạt & Kênh Hỗ Trợ 24/7
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-4">
+          Thanh Toán Cọc VietQR & <span class="text-gradient">Kết Nối Đa Kênh</span>
+        </h2>
+        <p class="text-slate-400 text-base sm:text-lg">
+          Chuyển khoản an toàn tức thì qua mã QR ngân hàng hoặc kết nối trực tiếp với đội ngũ tư vấn qua Zalo, WhatsApp, Facebook.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- COL 1: VIETQR TRANSFER CARD (5 COLS) -->
+        <div class="lg:col-span-5 bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-800 hover:border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl transition-all">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Thanh Toán Chuyển Khoản</span>
+              <h3 class="text-lg font-bold text-white mt-0.5">Quét Mã VietQR Tức Thì</h3>
+            </div>
+            <div class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 24/7 Auto
+            </div>
+          </div>
+
+          <!-- Dynamic QR Image -->
+          <div class="bg-white p-4 rounded-2xl shadow-inner max-w-[260px] mx-auto mb-6 text-center">
+            <img src="https://api.vietqr.io/image/970422-0909123456-compact2.png?amount=9000000&addInfo=DAT%20COC%20TOUR&accountName=VIETJOURNEYS%20TRAVEL" alt="VietQR Transfer" class="w-full h-auto mx-auto object-contain rounded-lg">
+            <span class="text-[10px] text-slate-500 font-medium block mt-2">Hỗ trợ tất cả ứng dụng Ngân hàng & Ví điện tử</span>
+          </div>
+
+          <!-- Banking Info Details -->
+          <div class="space-y-3 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 text-xs text-slate-300">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Ngân hàng:</span>
+              <span class="font-bold text-white">MB Bank (Quân Đội)</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Số tài khoản:</span>
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-bold text-cyan-400 text-sm">0909 123 456</span>
+                <button onclick="copyToClipboard('0909123456', 'Đã sao chép số tài khoản!')" class="p-1 hover:text-white text-slate-400 transition" title="Sao chép">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Chủ tài khoản:</span>
+              <span class="font-semibold text-white">CÔNG TY TNHH VIETJOURNEYS</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Nội dung CK:</span>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-amber-300 font-semibold">[Họ tên] + [SĐT] + [Tên Tour]</span>
+                <button onclick="copyToClipboard('COC TOUR', 'Đã sao chép cú pháp!')" class="p-1 hover:text-white text-slate-400 transition" title="Sao chép">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 text-center mt-4">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400 inline mr-1"></i> Sau khi chuyển cọc, hệ thống AI & CSKH sẽ gửi tin nhắn SMS / Email xác nhận trong 5 phút.
+          </p>
+        </div>
+
+        <!-- COL 2: DIRECT CONTACT & SOCIAL PLATFORMS & SHARING (7 COLS) -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- SOCIAL CHANNELS (ZALO - WHATSAPP - FACEBOOK) -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+            <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+              <i data-lucide="message-circle" class="w-5 h-5 text-cyan-400"></i> Kênh Tư Vấn & Chat Trực Tiếp 24/7
+            </h3>
+            <p class="text-xs text-slate-400 mb-6">
+              Chọn kênh liên hệ tiện lợi nhất với bạn để gặp nhân viên hỗ trợ hoặc nhận trọn bộ lịch trình PDF qua điện thoại.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              
+              <!-- ZALO BUTTON -->
+              <a href="https://zalo.me/0909123456" target="_blank" rel="noopener noreferrer" class="group bg-blue-950/40 hover:bg-blue-900/50 border border-blue-500/30 hover:border-blue-400 rounded-2xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/20">
+                <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-extrabold text-sm mb-3 shadow-md shadow-blue-600/40 group-hover:scale-110 transition-transform">
+                  Zalo
+                </div>
+                <strong class="text-sm text-white block mb-0.5">Chat Qua Zalo</strong>
+                <span class="text-[11px] text-blue-300">0909 123 456 (24/7)</span>
+                <span class="mt-2 text-[10px] text-slate-400 font-medium flex items-center gap-1"><i data-lucide="send" class="w-3 h-3 text-blue-400"></i> Nhận lịch trình</span>
+              </a>
+
+              <!-- WHATSAPP BUTTON -->
+              <a href="https://wa.me/84909123456?text=Xin%20chao%20VietJourneys,%20toi%20muon%20tu%20van%20tour" target="_blank" rel="noopener noreferrer" class="group bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/30 hover:border-emerald-400 rounded-2xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white mb-3 shadow-md shadow-emerald-600/40 group-hover:scale-110 transition-transform">
+                  <i data-lucide="phone-call" class="w-6 h-6"></i>
+                </div>
+                <strong class="text-sm text-white block mb-0.5">WhatsApp Chat</strong>
+                <span class="text-[11px] text-emerald-300">+84 909 123 456</span>
+                <span class="mt-2 text-[10px] text-slate-400 font-medium flex items-center gap-1"><i data-lucide="globe" class="w-3 h-3 text-emerald-400"></i> International Pax</span>
+              </a>
+
+              <!-- FACEBOOK MESSENGER -->
+              <a href="https://m.me/vietjourneys.travel" target="_blank" rel="noopener noreferrer" class="group bg-indigo-950/40 hover:bg-indigo-900/50 border border-indigo-500/30 hover:border-indigo-400 rounded-2xl p-4 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/20">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white mb-3 shadow-md shadow-indigo-600/40 group-hover:scale-110 transition-transform">
+                  <i data-lucide="facebook" class="w-6 h-6"></i>
+                </div>
+                <strong class="text-sm text-white block mb-0.5">Fanpage / Inbox</strong>
+                <span class="text-[11px] text-indigo-300">VietJourneys Travel</span>
+                <span class="mt-2 text-[10px] text-slate-400 font-medium flex items-center gap-1"><i data-lucide="message-square" class="w-3 h-3 text-indigo-400"></i> Phản hồi 1 phút</span>
+              </a>
+
+            </div>
+          </div>
+
+          <!-- SHARING SUITE (FACEBOOK, ZALO, TWITTER/X, TELEGRAM, COPY LINK) -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="share-2" class="w-5 h-5 text-purple-400"></i> Chia Sẻ Tour Này Cho Bạn Bè & Người Thân
+                </h3>
+                <p class="text-xs text-slate-400">Gửi ngay thông tin tour hấp dẫn và ưu đãi giảm giá nhóm đến mạng xã hội</p>
+              </div>
+            </div>
+
+            <!-- Share Buttons Row -->
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- Share Facebook -->
+              <button onclick="shareToSocial('facebook')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 transition shadow-md shadow-blue-600/30 flex items-center gap-2">
+                <i data-lucide="facebook" class="w-4 h-4"></i> Facebook
+              </button>
+
+              <!-- Share Zalo -->
+              <button onclick="shareToSocial('zalo')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 transition shadow-md shadow-cyan-600/30 flex items-center gap-2">
+                <span class="font-bold">Z</span> Zalo Share
+              </button>
+
+              <!-- Share WhatsApp -->
+              <button onclick="shareToSocial('whatsapp')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition shadow-md shadow-emerald-600/30 flex items-center gap-2">
+                <i data-lucide="phone-forwarded" class="w-4 h-4"></i> WhatsApp
+              </button>
+
+              <!-- Share Twitter / X -->
+              <button onclick="shareToSocial('twitter')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-2">
+                <i data-lucide="twitter" class="w-4 h-4"></i> Twitter/X
+              </button>
+
+              <!-- Copy Link Button -->
+              <button onclick="copyCurrentPageUrl()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-200 bg-slate-800/90 hover:bg-slate-700 hover:text-white border border-slate-700 transition flex items-center gap-2">
+                <i data-lucide="link" class="w-4 h-4"></i> Sao Chép Link
+              </button>
+            </div>
+            
+            <div id="share-toast" class="hidden mt-3 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4"></i> <span id="share-toast-msg">Đã sao chép đường link tour thành công!</span>
+            </div>
+          </div>
+
+          <!-- HEADQUARTER & CONTACT INFO -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 text-xs text-slate-300 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <strong class="text-white block text-sm mb-0.5">Trụ Sở Điều Hành:</strong>
+                <span>06 Huyền Trân Công Chúa, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh</span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <strong class="text-white block text-sm mb-0.5">Email & Hotline:</strong>
+                <span>Hotline: 0909 123 456<br>Email: booking@vietjourneys.vn</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <footer class="border-t border-slate-800 bg-slate-950/90 pt-16 pb-12 text-slate-400 text-xs">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+        
+        <!-- Brand Col -->
+        <div class="col-span-2">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <span class="text-base font-bold text-white">TourFlow AI</span>
+          </div>
+          <p class="text-slate-400 leading-relaxed mb-4 max-w-sm">
+            Nền tảng Trợ lý AI Tự hành và Điều phối Giữ chỗ Tự động hàng đầu dành cho doanh nghiệp du lịch, lữ hành và khách sạn tại Việt Nam.
+          </p>
+          <div class="flex items-center gap-3 text-slate-400">
+            <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:text-white hover:bg-slate-700"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+            <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:text-white hover:bg-slate-700"><i data-lucide="linkedin" class="w-4 h-4"></i></a>
+            <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:text-white hover:bg-slate-700"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+          </div>
+        </div>
+
+        <!-- Links Col 1 -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider mb-4 text-xs">Sản Phẩm</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#tinh-nang" class="hover:text-white">RAG Knowledge Engine</a></li>
+            <li><a href="#tinh-nang" class="hover:text-white">Dynamic Itinerary</a></li>
+            <li><a href="#tinh-nang" class="hover:text-white">Booking Dispatcher</a></li>
+            <li><a href="#bang-gia" class="hover:text-white">Bảng giá dịch vụ</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Col 2 -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider mb-4 text-xs">Tích Hợp</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="hover:text-white">Zalo Official Account</a></li>
+            <li><a href="#" class="hover:text-white">Facebook Messenger</a></li>
+            <li><a href="#" class="hover:text-white">Cloudbeds & EzCloud</a></li>
+            <li><a href="#" class="hover:text-white">Webhook API</a></li>
+          </ul>
+        </div>
+
+        <!-- Links Col 3 -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider mb-4 text-xs">Pháp Lý</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="hover:text-white">Chính sách bảo mật (NDA)</a></li>
+            <li><a href="#" class="hover:text-white">Điều khoản sử dụng</a></li>
+            <li><a href="#" class="hover:text-white">Tiêu chuẩn SLA 99.9%</a></li>
+            <li><a href="#" class="hover:text-white">Báo cáo an toàn dữ liệu</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500">
+        <div>© 2026 TourFlow AI Inc. Bản quyền đã được bảo hộ.</div>
+        <div class="flex items-center gap-6">
+          <span>Hệ thống vận hành tiêu chuẩn ISO/IEC 27001</span>
+          <span>Hạ tầng Cloud tại Việt Nam</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==================== 9. FLOATING CHAT WIDGET & POPUP ==================== -->
+  
+  <!-- Tooltip Pill (Shows after 3s) -->
+  <div id="fab-tooltip" class="fixed bottom-24 right-6 z-50 bg-slate-900 border border-cyan-500/40 text-slate-200 text-xs px-3.5 py-2 rounded-xl shadow-xl flex items-center gap-2 transform translate-y-4 opacity-0 pointer-events-none transition-all duration-500">
+    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+    <span>Hỏi AI bất kỳ điều gì về tour & phòng...</span>
+    <button onclick="closeTooltip(event)" class="text-slate-400 hover:text-white ml-1">✕</button>
+  </div>
+
+  <!-- Floating Action Button (FAB) -->
+  <button id="fab-chat-btn" onclick="toggleChatPopup()" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center shadow-2xl shadow-blue-600/50 hover:scale-105 active:scale-95 transition-all">
+    <i data-lucide="message-square" id="fab-icon-open" class="w-6 h-6"></i>
+    <i data-lucide="x" id="fab-icon-close" class="w-6 h-6 hidden"></i>
+  </button>
+
+  <!-- Floating Chat Popup Modal -->
+  <div id="chat-popup" class="fixed bottom-24 right-6 z-50 w-[360px] sm:w-[400px] h-[520px] bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden hidden transform origin-bottom-right transition-all">
+    
+    <!-- Header -->
+    <div class="px-4 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-white flex items-center gap-1.5">
+            TourFlow Live Assistant
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div class="text-[10px] text-slate-400 font-mono">Trực tuyến 24/7 • Sẵn sàng hỗ trợ</div>
+        </div>
+      </div>
+      <button onclick="toggleChatPopup()" class="text-slate-400 hover:text-white p-1">
+        <i data-lucide="minus" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Message Body -->
+    <div id="popup-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+      <div class="flex items-start gap-2">
+        <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white shrink-0 mt-0.5">
+          <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+        </div>
+        <div class="bg-slate-800 rounded-2xl rounded-tl-sm p-3 text-slate-200 border border-slate-700/60 max-w-[85%] leading-relaxed">
+          Xin chào! Em là Trợ lý AI của TourFlow. Anh/Chị đang quan tâm đến giải pháp tích hợp chatbot hay cần gợi ý lịch trình tour cụ thể ạ?
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Prompts -->
+    <div class="px-3 py-2 bg-slate-950/60 border-t border-slate-800 flex gap-2 overflow-x-auto text-[11px] no-scrollbar">
+      <button onclick="sendQuickMessage('Cho tôi xem bảng giá chi tiết')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+        💰 Bảng giá chi tiết
+      </button>
+      <button onclick="sendQuickMessage('Cách tích hợp vào Zalo OA')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+        ⚡ Tích hợp Zalo OA
+      </button>
+    </div>
+
+    <!-- Input Box -->
+    <form onsubmit="handlePopupSend(event)" class="p-3 bg-slate-950 border-t border-slate-800 flex items-center gap-2">
+      <input id="popup-input" type="text" placeholder="Nhập câu hỏi của bạn..." class="flex-1 bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white rounded-lg focus:outline-none focus:border-cyan-400">
+      <button type="submit" class="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg">
+        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+      </button>
+    </form>
+
+  </div>
+
+  <!-- ==================== JAVASCRIPT CONTROLLERS ==================== -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Mobile Hamburger Menu Toggle
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+      });
+    });
+
+    // Typewriter Animation in Hero Split-Screen Simulator
+    const aiText = "Dạ chào anh, em đã kiểm tra kho tour: Gợi ý tối ưu nhất là Tour Đà Nẵng 3N2Đ ở tại Grand Sea Hotel 4 sao ven biển (bao gồm buffet sáng và xe riêng đưa đón 2 chiều sân bay).";
+    const typewriterEl = document.getElementById('typewriter-text');
+    const actionsEl = document.getElementById('booking-actions');
+    const processingEl = document.getElementById('ai-processing-status');
+    let charIndex = 0;
+
+    function typeWriter() {
+      if (charIndex < aiText.length) {
+        typewriterEl.textContent += aiText.charAt(charIndex);
+        typewriterEl.classList.add('typing-cursor');
+        charIndex++;
+        setTimeout(typeWriter, 22);
+      } else {
+        typewriterEl.classList.remove('typing-cursor');
+        actionsEl.classList.remove('opacity-0');
+        actionsEl.classList.add('opacity-100');
+        processingEl.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span class="text-emerald-400 font-semibold">Đã đồng bộ xong dữ liệu (0.78s)</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    // Trigger Typewriter after 800ms
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(typeWriter, 800);
+    });
+
+    // Simulate Booking Click in Hero
+    function simulateBookingSuccess(btn) {
+      btn.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i><span>Đã gửi lệnh giữ chỗ tới Saigon Heritage Travel!</span>`;
+      btn.classList.remove('from-emerald-600', 'to-teal-600');
+      btn.classList.add('bg-blue-600');
+      btn.disabled = true;
+      lucide.createIcons();
+    }
+
+    // FAQ Accordion Toggle
+    function toggleFaq(btn) {
+      const content = btn.nextElementSibling;
+      const icon = btn.querySelector('[data-lucide="chevron-down"]');
+      const isHidden = content.classList.contains('hidden');
+
+      // Close other FAQs
+      document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+      document.querySelectorAll('#faqs [data-lucide="chevron-down"]').forEach(i => i.classList.remove('rotate-180'));
+
+      if (isHidden) {
+        content.classList.remove('hidden');
+        if (icon) icon.classList.add('rotate-180');
+      }
+    }
+
+    // Floating Action Button (FAB) Tooltip Timer (3 seconds)
+    setTimeout(() => {
+      const tooltip = document.getElementById('fab-tooltip');
+      if (tooltip) {
+        tooltip.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+      }
+    }, 3000);
+
+    function closeTooltip(e) {
+      e.stopPropagation();
+      const tooltip = document.getElementById('fab-tooltip');
+      tooltip.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    // Floating Chat Popup Toggle
+    function toggleChatPopup() {
+      const popup = document.getElementById('chat-popup');
+      const openIcon = document.getElementById('fab-icon-open');
+      const closeIcon = document.getElementById('fab-icon-close');
+      const tooltip = document.getElementById('fab-tooltip');
+
+      if (tooltip) tooltip.classList.add('opacity-0', 'pointer-events-none');
+
+      popup.classList.toggle('hidden');
+      openIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
+
+    // Popup Chat Interaction
+    function handlePopupSend(e) {
+      e.preventDefault();
+      const input = document.getElementById('popup-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage(text, 'user');
+      input.value = '';
+
+      // AI Simulated Reply
+      setTimeout(() => {
+        appendChatMessage("Cảm ơn anh/chị! Chuyên viên giải pháp AI sẽ liên hệ hỗ trợ tích hợp thử nghiệm qua email/Zalo của anh/chị ngay nhé.", 'bot');
+      }, 700);
+    }
+
+    function sendQuickMessage(text) {
+      appendChatMessage(text, 'user');
+      setTimeout(() => {
+        if (text.includes('Bảng giá')) {
+          appendChatMessage("Gói Professional hiện đang được ưu đãi chỉ từ 4.990.000đ/tháng với đầy đủ RAG không giới hạn và kết nối Zalo OA ạ!", 'bot');
+        } else {
+          appendChatMessage("Việc tích hợp Zalo OA chỉ mất 2 phút thông qua Webhook được cấp sẵn trong Dashboard quản trị anh/chị nhé.", 'bot');
+        }
+      }, 600);
+    }
+
+    function appendChatMessage(text, sender) {
+      const container = document.getElementById('popup-messages');
+      const msgDiv = document.createElement('div');
+
+      if (sender === 'user') {
+        msgDiv.className = 'flex justify-end';
+        msgDiv.innerHTML = `<div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm p-3 max-w-[85%]">${text}</div>`;
+      } else {
+        msgDiv.className = 'flex items-start gap-2';
+        msgDiv.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white shrink-0 mt-0.5">
+            <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+          </div>
+          <div class="bg-slate-800 rounded-2xl rounded-tl-sm p-3 text-slate-200 border border-slate-700/60 max-w-[85%] leading-relaxed">${text}</div>
+        `;
+      }
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    // Handle Sign-Up Form Submit
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      alert("Chúc mừng! Đăng ký dùng thử 14 ngày của bạn đã được ghi nhận. Đội ngũ kỹ thuật sẽ gửi thông tin truy cập hệ thống qua email trong 5 phút tới.");
+    }
+
+    // Lắng nghe sự kiện chuyển đổi Booking từ ai-chat-widget.js để đo lường GA4 / Meta Pixel
+    window.addEventListener('bookingDispatched', (event) => {
+      console.log('🎉 [Conversion Triggered] Booking Order Dispatched:', event.detail);
+      // Gợi ý đo lường:
+      // if (typeof gtag === 'function') { gtag('event', 'purchase', event.detail); }
+      // if (typeof fbq === 'function') { fbq('track', 'Purchase', { value: event.detail.total_estimated_price, currency: 'VND' }); }
+    });
+  </script>
+
+  <!-- Module AI Chatbot & Booking Dispatcher Độc Lập -->
+  <script src="ai-chat-widget.js"></script>
+
+  <script>
+    // Tour Data Store for Modal & Booking
+    const TOURS_STORE = {
+      korea: {
+        category: 'Du Lịch Hàn Quốc (5N4Đ) - Vietjet Air',
+        title: 'SEOUL - NAMI - EVERLAND (5N4Đ)',
+        subtitle: 'Khởi hành: 22/11/2026 (Có mặt sân bay đêm 21/11) | Chuyến bay VJ862/VJ861',
+        price: '17.900.000 VNĐ / Khách',
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <img src="assets/tours/korea-nami.jpeg" alt="Đảo Nami" class="rounded-xl w-full h-44 object-cover border border-slate-700">
+            <img src="assets/tours/korea-everland.jpeg" alt="Everland" class="rounded-xl w-full h-44 object-cover border border-slate-700">
+          </div>
+
+          <div class="bg-blue-950/30 border border-blue-500/20 p-4 rounded-xl mb-4">
+            <h4 class="text-cyan-400 font-bold mb-2 flex items-center gap-2"><i data-lucide="star" class="w-4 h-4 text-amber-400"></i> Ưu Đãi Độc Quyền Theo Tour</h4>
+            <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
+              <li><strong>Tặng vé xem The Painter Show</strong> biểu diễn nghệ thuật nổi tiếng.</li>
+              <li><strong>Tặng trải nghiệm mặc Hanbok truyền thống</strong> & tự tay học làm Kimchi chuẩn vị.</li>
+              <li><strong>Tặng suất ăn nhẹ</strong> trên chuyến bay Vietjet Air khứ hồi.</li>
+              <li><strong>Khách sạn 4 sao gần trung tâm:</strong> Stanford, Sono Calm, Sollago Myeongdong, Golden Seoul.</li>
+            </ul>
+          </div>
+
+          <h4 class="text-white font-bold text-base mb-3 flex items-center gap-2"><i data-lucide="map" class="w-4 h-4 text-cyan-400"></i> Lịch Trình Chi Tiết</h4>
+          <div class="space-y-3 border-l-2 border-slate-800 pl-4 text-xs">
+            <div>
+              <strong class="text-cyan-300 block">Khuya Ngày 1: TP.HCM - SEOUL (Nghỉ đêm trên máy bay)</strong>
+              <span>Tập trung tại Tân Sơn Nhất ga quốc tế, làm thủ tục chuyến bay VJ862 (02:40 - 09:45) đi Incheon.</span>
+            </div>
+            <div>
+              <strong class="text-cyan-300 block">Ngày 2: ĐẢO NAMI - THÁP NAMSAN (Ăn trưa, tối)</strong>
+              <span>Tham quan Đảo Nami bốn mùa quyến rũ, ngắm toàn cảnh thủ đô tại biểu tượng Tháp NamSan. Nhận phòng khách sạn 4 sao.</span>
+            </div>
+            <div>
+              <strong class="text-cyan-300 block">Ngày 3: SEOUL - EVERLAND - MYEONGDONG (Ăn sáng, trưa, tối)</strong>
+              <span>Vui chơi thả ga tại Đại công viên giải trí Everland với các trò chơi cảm giác mạnh. Mua sắm tại phố sầm uất Myeongdong / Hongdae.</span>
+            </div>
+            <div>
+              <strong class="text-cyan-300 block">Ngày 4: CUNG CẢNH PHÚC - NHÀ XANH - THE PAINTER SHOW (Ăn sáng, trưa, tối)</strong>
+              <span>Chiêm bái Cung điện Kyeongbok (Cảnh Phúc Cung), chụp ảnh bên ngoài Nhà Xanh Phủ Tổng Thống, xem kịch nghệ thuật Painter Show.</span>
+            </div>
+            <div>
+              <strong class="text-cyan-300 block">Ngày 5: KIMCHI & HANBOK - LÀNG HANOK - TP.HCM (Ăn sáng, trưa, tối nhẹ)</strong>
+              <span>Trải nghiệm làm Kimchi & diện Hanbok, dạo bước Làng cổ Hanok Bukchon và con đường đá lãng mạn Deoksugung. Chiều đáp chuyến bay VJ861 (21:15 - 00:40) về lại TP.HCM.</span>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+              <strong class="text-emerald-400 block mb-1">Giá Tour Bao Gồm:</strong>
+              <p>Vé máy bay khứ hồi Vietjet Air, thuế phí sân bay 2 nước, khách sạn 4* (2-3 khách/phòng), visa nhập cảnh Hàn Quốc, xe máy lạnh, ăn uống chuẩn Hàn, vé tham quan, bảo hiểm du lịch, HDV suốt tuyến, nón du lịch.</p>
+            </div>
+            <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+              <strong class="text-amber-400 block mb-1">Không Bao Gồm & Phụ Thu:</strong>
+              <p>Phụ thu phòng đơn (6.800.000 VNĐ nếu có), Tips HDV & tài xế địa phương (35 USD/tour), chi phí cá nhân, phát sinh ngoài chương trình.</p>
+            </div>
+          </div>
+        `
+      },
+      cuchi: {
+        category: 'Du Lịch Lịch Sử & Di Sản (01 Ngày)',
+        title: 'TOUR ĐỊA ĐẠO CỦ CHI HUYỀN THOẠI',
+        subtitle: 'Khởi hành: 13/11/2026 | Xe du lịch 29C đưa đón tại TP.HCM',
+        price: 'Từ 1.100.000 VNĐ / Khách',
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <img src="assets/tours/cuchi-tunnels.jpeg" alt="Địa Đạo Củ Chi" class="rounded-xl w-full h-44 object-cover border border-slate-700">
+            <img src="assets/tours/cuchi-experience.jpeg" alt="Trải nghiệm chui hầm" class="rounded-xl w-full h-44 object-cover border border-slate-700">
+          </div>
+
+          <div class="bg-emerald-950/30 border border-emerald-500/20 p-4 rounded-xl mb-4">
+            <h4 class="text-emerald-400 font-bold mb-2 flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-amber-400"></i> Trải Nghiệm Điểm Nhấn</h4>
+            <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
+              <li>Thuyết minh tổng quan lịch sử hào hùng, xem sa bàn & phim tài liệu mạng lưới 200km địa đạo.</li>
+              <li>Trực tiếp trải nghiệm chui đoạn hầm đã được mở rộng cho du khách thử cảm giác người lính năm xưa.</li>
+              <li>Khám phá bếp không khói Hoàng Cầm, hệ thống bẫy chông & lối thoát hiểm nguy hiểm nhưng tài tình.</li>
+              <li>Thưởng thức món <strong>khoai mì chấm muối mè</strong> và nhâm nhi chén trà nóng chiến khu.</li>
+              <li>Thử tài thiện xạ tại trường bắn súng thể thao quốc phòng (AK-47, M16 - chi phí tự túc).</li>
+            </ul>
+          </div>
+
+          <h4 class="text-white font-bold text-base mb-3 flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-emerald-400"></i> Lịch Trình Chi Tiết Trong Ngày</h4>
+          <div class="space-y-3 border-l-2 border-slate-800 pl-4 text-xs">
+            <div>
+              <strong class="text-emerald-300 block">08:00 Sáng: TP.HCM - KHỞI HÀNH ĐI CỦ CHI</strong>
+              <span>Xe du lịch và HDV đón khách tại điểm hẹn trung tâm, xuất phát đi Củ Chi. HDV thuyết minh lịch sử và các câu chuyện kháng chiến trên đường đi.</span>
+            </div>
+            <div>
+              <strong class="text-emerald-300 block">09:30 - 12:00: THAM QUAN KHU DI TÍCH ĐỊA ĐẠO</strong>
+              <span>Xem phim tư liệu tại khu trưng bày; khám phá mê cung lòng đất; thăm bếp Hoàng Cầm; thưởng thức khoai mì chiến khu; tham quan trường bắn súng quân dụng.</span>
+            </div>
+            <div>
+              <strong class="text-emerald-300 block">12:30: DÙNG BỮA TRƯA ĐẶC SẢN NAM BỘ</strong>
+              <span>Đoàn dùng bữa trưa chất lượng cao tại nhà hàng địa phương với thực đơn đặc sản miền quê (suất ăn 270.000 VNĐ/khách).</span>
+            </div>
+            <div>
+              <strong class="text-emerald-300 block">14:00 - 15:30: CỦ CHI - VỀ LẠI TP.HCM</strong>
+              <span>Khởi hành về lại điểm đón ban đầu. HDV gửi lời chào tạm biệt và hẹn gặp lại quý khách!</span>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-800 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 text-xs">
+            <strong class="text-cyan-400 block mb-1">Chính Sách Giá Đoàn Ưu Đãi:</strong>
+            <p>• Nhóm 10 - 14 khách: <strong>1.325.000 VNĐ/khách</strong><br>• Nhóm 15 - 19 khách: <strong>1.200.000 VNĐ/khách</strong><br>• Nhóm 20 - 24 khách: <strong>1.100.000 VNĐ/khách</strong><br>Đã bao gồm xe 29c, 01 bữa trưa 270k, vé tham quan trọn tuyến, HDV song ngữ, bảo hiểm, nón và nước suối.</p>
+          </div>
+        `
+      },
+      citytour: {
+        category: 'Du Lịch Đô Thị & Trải Nghiệm Metro (01 Ngày)',
+        title: 'CITY TOUR TP.HCM - METRO - CHÙA BỬU LONG',
+        subtitle: 'Khởi hành: 28/11/2026 | Tập trung: Nhà hàng Đoàn Viên (06 Huyền Trân Công Chúa, Q.1)',
+        price: 'Từ 770.000 VNĐ / Khách',
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <img src="assets/tours/city-buulong.jpeg" alt="Chùa Bửu Long" class="rounded-xl w-full h-44 object-cover border border-slate-700">
+            <img src="assets/tours/city-metro.jpeg" alt="Tuyến Metro TP.HCM" class="rounded-xl w-full h-44 object-cover border border-slate-700">
+          </div>
+
+          <div class="bg-purple-950/30 border border-purple-500/20 p-4 rounded-xl mb-4">
+            <h4 class="text-purple-400 font-bold mb-2 flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-purple-400"></i> Trải Nghiệm Đô Thị Mới Lạ</h4>
+            <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
+              <li>Điểm tâm sáng ấm cúng tại Nhà hàng Đoàn Viên Quận 1.</li>
+              <li>Check-in lưu niệm tại Ủy Ban Nhân Dân Thành Phố & Nhà Hát Thành Phố kiến trúc Pháp cổ kính.</li>
+              <li>Trải nghiệm tuyến tàu điện <strong>Metro ngầm hiện đại bậc nhất</strong>.</li>
+              <li>Viếng <strong>Đền Tưởng Niệm các Vua Hùng</strong> trang nghiêm, hướng về cội nguồn dân tộc.</li>
+              <li>Chiêm ngưỡng tuyệt tác kiến trúc chùa Thái Lan tại <strong>Chùa Bửu Long</strong> bên bờ sông Đồng Nai.</li>
+              <li>Bữa trưa ẩm thực dân dã đồng quê tại <strong>Khu Du Lịch Sen Nam Bộ</strong>.</li>
+            </ul>
+          </div>
+
+          <h4 class="text-white font-bold text-base mb-3 flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-purple-400"></i> Lịch Trình Chi Tiết Trong Ngày</h4>
+          <div class="space-y-3 border-l-2 border-slate-800 pl-4 text-xs">
+            <div>
+              <strong class="text-purple-300 block">07:30: ĐIỂM TÂM SÁNG TẠI NHÀ HÀNG ĐOÀN VIÊN</strong>
+              <span>Tập trung tại số 06 Huyền Trân Công Chúa, Q.1. Dùng điểm tâm sáng nạp năng lượng.</span>
+            </div>
+            <div>
+              <strong class="text-purple-300 block">08:30: CHECK-IN TRUNG TÂM SÀI GÒN & TRẢI NGHIỆM METRO</strong>
+              <span>Xe đưa đoàn chụp hình tại UBND & Nhà Hát TP. Lên tàu trải nghiệm tuyến Metro hiện đại ra trạm ngoại thành.</span>
+            </div>
+            <div>
+              <strong class="text-purple-300 block">09:30 - 11:30: VIẾNG ĐỀN VUA HÙNG & CHÙA BỬU LONG</strong>
+              <span>Viếng Khu tưởng niệm Vua Hùng; tiếp tục chiêm bái Chùa Bửu Long nguy nga và thanh tịnh.</span>
+            </div>
+            <div>
+              <strong class="text-purple-300 block">12:00: DÙNG BỮA TRƯA TẠI KDL SEN NAM BỘ</strong>
+              <span>Thưởng thức ẩm thực đồng quê dân dã giữa không gian hồ sen xanh mát.</span>
+            </div>
+            <div>
+              <strong class="text-purple-300 block">15:00: TRỞ VỀ ĐIỂM XUẤT PHÁT</strong>
+              <span>Xe đưa đoàn về lại điểm đón ban đầu. Kết thúc chương trình khám phá ý nghĩa.</span>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-800 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 text-xs">
+            <strong class="text-cyan-400 block mb-1">Biểu Phí Theo Đoàn (Đã gồm ăn sáng + trưa):</strong>
+            <p>• Nhóm 20 - 24 khách: <strong>830.000 VNĐ/khách</strong><br>• Nhóm 25 - 28 khách: <strong>770.000 VNĐ/khách</strong><br>Đã bao gồm xe du lịch 29C, 01 bữa sáng + 01 bữa trưa, vé tham quan, HDV, bảo hiểm du lịch, nón và nước suối.</p>
+          </div>
+        `
+      }
+    };
+
+    function openTourModal(tourKey) {
+      const tour = TOURS_STORE[tourKey];
+      if (!tour) return;
+      document.getElementById('modal-category').innerText = tour.category;
+      document.getElementById('modal-title').innerText = tour.title;
+      document.getElementById('modal-subtitle').innerText = tour.subtitle;
+      document.getElementById('modal-content').innerHTML = tour.content;
+      document.getElementById('modal-price').innerText = tour.price;
+      
+      const bookBtn = document.getElementById('modal-book-btn');
+      bookBtn.onclick = () => {
+        closeTourModal();
+        triggerTourBooking(tour.title, tour.price, tour.subtitle.split('|')[0] || '');
+      };
+
+      const modal = document.getElementById('tour-detail-modal');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+      }, 20);
+      if (window.lucide) { lucide.createIcons(); }
+    }
+
+    function closeTourModal() {
+      const modal = document.getElementById('tour-detail-modal');
+      modal.classList.add('opacity-0');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function triggerTourBooking(tourName, tourPrice, tourDate) {
+      if (window.TourFlowChat) {
+        window.TourFlowChat.toggleWindow(true);
+        window.TourFlowChat.sendMessage(`Em muốn đăng ký giữ chỗ ${tourName} (${tourPrice}). Vui lòng tư vấn giúp em!`);
+      } else {
+        const ctaForm = document.getElementById('dang-ky');
+        if (ctaForm) {
+          ctaForm.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  </script>
+
+  <!-- Helper scripts for Copy, Social Share, and Navigation -->
+  <script>
+    function copyToClipboard(text, message) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showShareToast(message || 'Đã sao chép thành công!');
+        });
+      } else {
+        const tempInput = document.createElement('input');
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        showShareToast(message || 'Đã sao chép thành công!');
+      }
+    }
+
+    function copyCurrentPageUrl() {
+      const currentUrl = window.location.href;
+      copyToClipboard(currentUrl, 'Đã sao chép link website du lịch vào bộ nhớ tạm!');
+    }
+
+    function showShareToast(msg) {
+      const toast = document.getElementById('share-toast');
+      const toastMsg = document.getElementById('share-toast-msg');
+      if (toast && toastMsg) {
+        toastMsg.innerText = msg;
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3000);
+      } else {
+        alert(msg);
+      }
+    }
+
+    function shareToSocial(platform) {
+      const url = encodeURIComponent(window.location.href);
+      const title = encodeURIComponent('Khám Phá Các Hành Trình Du Lịch Trọng Điểm & Trải Nghiệm AI Agentic Booking - VietJourneys');
+      let shareUrl = '';
+
+      switch (platform) {
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+          break;
+        case 'zalo':
+          shareUrl = `https://sp.zalo.me/share_inline?url=${url}`;
+          break;
+        case 'whatsapp':
+          shareUrl = `https://api.whatsapp.com/send?text=${title}%20${url}`;
+          break;
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+          break;
+        default:
+          copyCurrentPageUrl();
+          return;
+      }
+
+      window.open(shareUrl, '_blank', 'width=600,height=500,scrollbars=yes,resizable=yes');
+    }
+  </script>
+
+</body>
+</html>

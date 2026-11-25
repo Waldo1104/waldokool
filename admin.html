@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TourFlow Admin Portal | Quản Trị Đặt Chỗ, Khách Truy Cập & Phân Quyền</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            background: {
+              primary: '#0F172A',
+              secondary: '#1E293B',
+              tertiary: '#334155',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Firebase App & Firestore SDKs (v9 Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-backup.js"></script>
+
+</head>
+<body class="bg-[#0B1120] text-slate-100 min-h-screen font-sans antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- ==================== 1. LOGIN SCREEN ==================== -->
+  <div id="login-section" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <!-- Ambient Glow Background -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-[128px] pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-600/20 rounded-full blur-[128px] pointer-events-none"></div>
+
+    <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl relative backdrop-blur-xl">
+      <!-- Brand Logo -->
+      <div class="flex items-center justify-center gap-3 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 p-[1.5px] shadow-lg shadow-cyan-500/20">
+          <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-6 h-6 text-cyan-400"></i>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold text-white">TourFlow <span class="text-cyan-400">Admin</span></h1>
+          <p class="text-xs text-slate-400">Control Panel & Booking Hub</p>
+        </div>
+      </div>
+
+      <!-- Quick Credentials Helper Box -->
+      <div class="mb-6 bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5 text-xs text-slate-300">
+        <div class="flex items-center gap-2 font-semibold text-cyan-400 mb-1">
+          <i data-lucide="info" class="w-4 h-4"></i> Tài khoản quản trị mặc định:
+        </div>
+        <p>• <strong>Main Admin:</strong> <code class="text-amber-300 font-mono">admin</code> | Mật khẩu: <code class="text-amber-300 font-mono">admin123</code></p>
+        <p>• <em>(Hoặc đăng nhập bằng Sub-Admin bạn tạo sau này)</em></p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Tên đăng nhập (Username)</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+            <input type="text" id="login-username" required placeholder="admin" value="admin" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Mật khẩu (Password)</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+            <input type="password" id="login-password" required placeholder="••••••••" value="admin123" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition">
+          </div>
+        </div>
+
+        <div id="login-error" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+          <span id="login-error-msg">Tên đăng nhập hoặc mật khẩu không đúng.</span>
+        </div>
+
+        <button type="submit" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-lg shadow-blue-600/30 transition duration-300 flex items-center justify-center gap-2 mt-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i> Đăng Nhập Hệ Thống
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <a href="index.html" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-cyan-400 transition">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Quay lại Trang Chủ Landing Page
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. MAIN ADMIN DASHBOARD ==================== -->
+  <div id="dashboard-section" class="hidden min-h-screen flex flex-col">
+    
+    <!-- Top Navbar -->
+    <header class="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-900/90 backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
+            <i data-lucide="compass" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-black text-white flex items-center gap-2">
+              TourFlow Control Center
+              <span id="role-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Main Admin</span>
+            </h2>
+            <p class="text-[10px] text-slate-400">Tracking Bookings, Traffic & Access Control</p>
+          </div>
+        </div>
+
+        <!-- Right Header Action -->
+        <div class="flex items-center gap-4">
+          <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-cyan-400 px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-800/40 hover:bg-slate-800 transition">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Xem Web Khách
+          </a>
+
+          <div class="flex items-center gap-3 pl-3 border-l border-slate-800">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 font-bold text-xs" id="user-avatar">
+                AD
+              </div>
+              <div class="hidden sm:block text-left">
+                <div class="text-xs font-bold text-white leading-tight" id="header-username">admin</div>
+                <div class="text-[10px] text-slate-400" id="header-userrole">Super Admin</div>
+              </div>
+            </div>
+
+            <button onclick="handleLogout()" title="Đăng xuất" class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Dashboard Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      
+      <!-- STATS OVERVIEW CARDS (TRAFFIC, BOOKING, VISITORS, CONVERSION) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        <!-- Stat 1: Total Visitors -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden shadow-lg">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng Lượt Khách (Visitors)</span>
+            <div class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="stat-visitors" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">1,482</span>
+            <span class="text-xs text-emerald-400 font-semibold flex items-center"><i data-lucide="trending-up" class="w-3 h-3 mr-0.5"></i> +18.4%</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">Dữ liệu lượt truy cập trang chủ & tour</p>
+        </div>
+
+        <!-- Stat 2: Page Views / Accesses -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden shadow-lg">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Lượt Xem Trang (Access/Views)</span>
+            <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center">
+              <i data-lucide="activity" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="stat-pageviews" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">4,926</span>
+            <span class="text-xs text-emerald-400 font-semibold flex items-center"><i data-lucide="trending-up" class="w-3 h-3 mr-0.5"></i> +24.1%</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">Tỷ lệ xem lịch trình chi tiết: 68%</p>
+        </div>
+
+        <!-- Stat 3: Total Bookings Dispatch -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden shadow-lg">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Đơn Tour Điều Phối (Bookings)</span>
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <i data-lucide="calendar-check" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="stat-bookings" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">38</span>
+            <span class="text-xs text-emerald-400 font-semibold flex items-center"><i data-lucide="check-check" class="w-3 h-3 mr-0.5"></i> 100% tự động</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">Tiếp nhận qua Form & AI Assistant</p>
+        </div>
+
+        <!-- Stat 4: Estimated Revenue Pipeline -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden shadow-lg">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng Doanh Số Dự Kiến</span>
+            <div class="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+              <i data-lucide="banknote" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span id="stat-revenue" class="text-2xl font-black text-white font-mono">428.5M</span>
+            <span class="text-xs text-purple-300 font-bold">VNĐ</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">Đang giữ chỗ & chờ thanh toán QR cọc</p>
+        </div>
+
+      </div>
+
+      <!-- NAVIGATION TABS -->
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <button onclick="switchTab('bookings')" id="tab-btn-bookings" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-md shadow-blue-600/30 flex items-center gap-2 transition">
+            <i data-lucide="list-ordered" class="w-4 h-4"></i> Quản Lý Đặt Chỗ (Bookings)
+          </button>
+          <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 transition">
+            <i data-lucide="pie-chart" class="w-4 h-4"></i> Lưu Lượng & Khách Truy Cập
+          </button>
+          <button onclick="switchTab('emails')" id="tab-btn-emails" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 transition">
+            <i data-lucide="mail-check" class="w-4 h-4 text-sky-400"></i> Lịch Sử Gửi Email
+          </button>
+          <button onclick="switchTab('admins')" id="tab-btn-admins" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 transition">
+            <i data-lucide="user-cog" class="w-4 h-4"></i> Phân Quyền Sub-Admins
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="handleCloudBackupClick()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1.5 transition">
+            <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> Sao Lưu Firebase
+          </button>
+          <button onclick="refreshData()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 flex items-center gap-1.5 transition">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm Mới Dữ Liệu
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 1: BOOKINGS MANAGEMENT ==================== -->
+      <div id="tab-bookings" class="space-y-4">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-950/40">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="inbox" class="w-4 h-4 text-cyan-400"></i> Danh Sách Hồ Sơ Đặt Tour
+              </h3>
+              <p class="text-xs text-slate-400">Theo dõi trạng thái, thông tin liên hệ và xử lý xác nhận giữ chỗ</p>
+            </div>
+            
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <input type="text" id="booking-search" oninput="renderBookingsTable()" placeholder="Tìm khách hàng, số điện thoại, mã tour..." class="w-full sm:w-64 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider">
+                  <th class="p-4">Mã Đơn</th>
+                  <th class="p-4">Khách Hàng & SĐT</th>
+                  <th class="p-4">Tên Tour / Điểm Đến</th>
+                  <th class="p-4">Ngày Khởi Hành</th>
+                  <th class="p-4">Số Khách</th>
+                  <th class="p-4">Tổng Dự Toán</th>
+                  <th class="p-4">Trạng Thái</th>
+                  <th class="p-4 text-right">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-tbody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+            <!-- ==================== TAB 4: EMAIL CONFIRMATION LOGS ==================== -->
+      <div id="tab-emails" class="hidden space-y-4">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-950/40">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="mail" class="w-4 h-4 text-sky-400"></i> Nhật Ký Gửi Email Xác Nhận Cho Khách Hàng
+              </h3>
+              <p class="text-xs text-slate-400">Theo dõi trạng thái gửi email tự động sau khi khách đặt tour & thanh toán cọc</p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/80 text-slate-400 font-semibold uppercase tracking-wider">
+                  <th class="p-4">Thời Gian</th>
+                  <th class="p-4">Mã Đơn / Khách Hàng</th>
+                  <th class="p-4">Email Người Nhận</th>
+                  <th class="p-4">Tiêu Đề Email</th>
+                  <th class="p-4">Trạng Thái</th>
+                  <th class="p-4 text-right">Xem Email</th>
+                </tr>
+              </thead>
+              <tbody id="emails-tbody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2: TRAFFIC & ACCESS LOGS ==================== -->
+      <div id="tab-analytics" class="hidden space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Traffic Sources -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+              <i data-lucide="share-2" class="w-4 h-4 text-cyan-400"></i> Nguồn Truy Cập (Traffic Sources)
+            </h4>
+            <div class="space-y-3.5 text-xs">
+              <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                  <span>Trực tiếp (Direct / Zalo / QR)</span>
+                  <span class="font-mono font-bold text-cyan-400">46% (682)</span>
+                </div>
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-cyan-500 rounded-full" style="width: 46%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                  <span>Mạng xã hội (Facebook / Group Du Lịch)</span>
+                  <span class="font-mono font-bold text-blue-400">32% (474)</span>
+                </div>
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-blue-500 rounded-full" style="width: 32%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                  <span>Tìm kiếm Google (Organic Search)</span>
+                  <span class="font-mono font-bold text-emerald-400">14% (208)</span>
+                </div>
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full" style="width: 14%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-300 mb-1">
+                  <span>Giới thiệu từ WhatsApp / Chia sẻ</span>
+                  <span class="font-mono font-bold text-purple-400">8% (118)</span>
+                </div>
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-purple-500 rounded-full" style="width: 8%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Destinations Viewed -->
+          <div class="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i> Điểm Đến Được Quan Tâm & Đặt Chỗ Nhiều Nhất
+            </h4>
+            <div class="space-y-4 text-xs">
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/40 border border-slate-700/50">
+                <div class="flex items-center gap-3">
+                  <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 font-bold flex items-center justify-center">1</span>
+                  <div>
+                    <strong class="text-white block">Tour Hàn Quốc: Seoul - Nami - Everland (5N4Đ)</strong>
+                    <span class="text-slate-400 text-[11px]">Lịch khởi hành 22/11/2026 • Bay Vietjet</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono font-bold text-cyan-400 block">2,140 lượt xem</span>
+                  <span class="text-emerald-400 text-[11px]">22 đơn đặt chỗ</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/40 border border-slate-700/50">
+                <div class="flex items-center gap-3">
+                  <span class="w-6 h-6 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold flex items-center justify-center">2</span>
+                  <div>
+                    <strong class="text-white block">Tour Địa Đạo Củ Chi Huyền Thoại (01 Ngày)</strong>
+                    <span class="text-slate-400 text-[11px]">Lịch khởi hành 13/11/2026 • Suất ăn 270k</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono font-bold text-cyan-400 block">1,510 lượt xem</span>
+                  <span class="text-emerald-400 text-[11px]">11 đơn đặt chỗ</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/40 border border-slate-700/50">
+                <div class="flex items-center gap-3">
+                  <span class="w-6 h-6 rounded-lg bg-purple-600/20 text-purple-400 font-bold flex items-center justify-center">3</span>
+                  <div>
+                    <strong class="text-white block">City Tour TP.HCM - Tuyến Metro - Chùa Bửu Long (01 Ngày)</strong>
+                    <span class="text-slate-400 text-[11px]">Lịch khởi hành 28/11/2026 • Ăn sáng + trưa</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono font-bold text-cyan-400 block">1,276 lượt xem</span>
+                  <span class="text-emerald-400 text-[11px]">5 đơn đặt chỗ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Realtime Access Log Table -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-slate-800 bg-slate-950/40">
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Nhật Ký Truy Cập Trực Tuyến Thời Gian Thực
+            </h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/80 text-slate-400 font-semibold uppercase">
+                  <th class="p-3">Thời Điểm</th>
+                  <th class="p-3">Địa Chỉ IP / Thiết Bị</th>
+                  <th class="p-3">Trang / Hành Động</th>
+                  <th class="p-3">Nguồn / Kênh</th>
+                  <th class="p-3">Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody id="access-logs-tbody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== TAB 3: ADMIN & SUB-ADMIN MANAGEMENT ==================== -->
+      <div id="tab-admins" class="hidden space-y-6">
+        
+        <!-- Only Main Admin Notice -->
+        <div id="subadmin-warning" class="hidden p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-center gap-3">
+          <i data-lucide="shield-alert" class="w-5 h-5 shrink-0"></i>
+          <span>Bạn đang đăng nhập bằng tài khoản <strong>Sub-Admin</strong>. Quyền tạo mới hoặc xóa tài khoản quản trị chỉ dành riêng cho <strong>Main Admin</strong>.</span>
+        </div>
+
+        <!-- Create Sub Admin Box (Visible only to main admin) -->
+        <div id="create-admin-box" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="user-plus" class="w-4 h-4 text-cyan-400"></i> Tạo Mới Tài Khoản Quản Trị Phụ (Sub-Admin)
+              </h3>
+              <p class="text-xs text-slate-400">Cấp tài khoản cho nhân viên tư vấn & điều hành tour xử lý đơn hàng</p>
+            </div>
+            <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-cyan-950 border border-cyan-800/40 text-cyan-300">Super Admin Exclusive</span>
+          </div>
+
+          <form onsubmit="handleCreateSubAdmin(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Tên Người Dùng (Họ tên)</label>
+              <input type="text" id="sub-fullname" required placeholder="Nguyễn Văn A" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Tên Đăng Nhập (Username)</label>
+              <input type="text" id="sub-username" required placeholder="tuvan_tour1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Mật Khẩu (Password)</label>
+              <input type="password" id="sub-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+            </div>
+
+            <div class="sm:col-span-3 flex justify-end">
+              <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-md shadow-cyan-500/20 transition flex items-center gap-1.5">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Khởi Tạo Sub-Admin
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Admins List Table -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/40">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="users-round" class="w-4 h-4 text-purple-400"></i> Danh Sách Nhân Sự Quản Trị Hệ Thống
+            </h3>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/80 text-slate-400 font-semibold uppercase">
+                  <th class="p-4">Họ Và Tên</th>
+                  <th class="p-4">Tên Đăng Nhập</th>
+                  <th class="p-4">Vai Trò (Role)</th>
+                  <th class="p-4">Ngày Tạo</th>
+                  <th class="p-4">Trạng Thái</th>
+                  <th class="p-4 text-right">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="admins-tbody" class="divide-y divide-slate-800/60 text-slate-300">
+                <!-- Dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC & STATE ENGINE ==================== -->
+  <script>
+    // 1. DATA INITIALIZATION & LOCALSTORAGE SYNC
+    const DEFAULT_ADMINS = [
+      {
+        id: 'adm-001',
+        username: 'admin',
+        password: 'admin123',
+        fullName: 'Nguyễn Quản Trị (Main Admin)',
+        role: 'main_admin',
+        createdAt: '01/11/2026',
+        status: 'ACTIVE'
+      },
+      {
+        id: 'adm-002',
+        username: 'dieuphoi_tour',
+        password: 'tour123',
+        fullName: 'Lê Thùy Trang (Điều Phối)',
+        role: 'sub_admin',
+        createdAt: '08/11/2026',
+        status: 'ACTIVE'
+      }
+    ];
+
+    const DEFAULT_BOOKINGS = [
+      {
+        booking_id: 'TF-904128',
+        customer_name: 'Nguyễn Hoàng Nam',
+        customer_phone: '0908123456',
+        tour_code: 'TOUR-HANQUOC-5N4D',
+        tour_name: 'Tour Hàn Quốc: Seoul - Nami - Everland (5N4Đ)',
+        departure_date: '22/11/2026',
+        pax_adults: 2,
+        pax_children: 1,
+        total_estimated_price: 52300000,
+        status: 'Đã Cọc QR (9Tr/khách)',
+        created_at: '18/11/2026 14:20',
+        note: 'Đã nhận hồ sơ visa, nộp lãnh sự quán'
+      },
+      {
+        booking_id: 'TF-681920',
+        customer_name: 'Trần Thị Mai Phương',
+        customer_phone: '0918765432',
+        tour_code: 'TOUR-CUCHI-01D',
+        tour_name: 'Tour Khám Phá Địa Đạo Củ Chi (1 Ngày)',
+        departure_date: '13/11/2026',
+        pax_adults: 15,
+        pax_children: 0,
+        total_estimated_price: 18000000,
+        status: 'Đã Xác Nhận Đi Xe',
+        created_at: '18/11/2026 10:15',
+        note: 'Đoàn cơ quan, xe 29c đón tại Quận 1'
+      },
+      {
+        booking_id: 'TF-452109',
+        customer_name: 'Phạm Minh Quân',
+        customer_phone: '0977889900',
+        tour_code: 'TOUR-CITY-01D',
+        tour_name: 'City Tour TP.HCM - Metro - Chùa Bửu Long (1 Ngày)',
+        departure_date: '28/11/2026',
+        pax_adults: 4,
+        pax_children: 0,
+        total_estimated_price: 3320000,
+        status: 'Chờ Tư Vấn Lại',
+        created_at: '17/11/2026 19:45',
+        note: 'Hỏi về thực đơn KDL Sen Nam Bộ'
+      }
+    ];
+
+    const DEFAULT_LOGS = [
+      { time: '19:42:10', ip: '113.161.42.18 (TP.HCM)', page: 'Xem Tour Hàn Quốc & Tháp Namsan', channel: 'Zalo Share', status: '200 OK' },
+      { time: '19:40:02', ip: '14.238.89.54 (Hà Nội)', page: 'Quét mã VietQR chuyển khoản cọc', channel: 'Direct Web', status: '200 OK' },
+      { time: '19:38:45', ip: '171.244.12.90 (Đà Nẵng)', page: 'Trao đổi AI Chatbot Tour Củ Chi', channel: 'Facebook Post', status: '200 OK' },
+      { time: '19:35:12', ip: '115.79.180.201 (Cần Thơ)', page: 'Xem Lịch Trình Metro & Chùa Bửu Long', channel: 'WhatsApp Link', status: '200 OK' },
+      { time: '19:31:00', ip: '42.112.80.33 (TP.HCM)', page: 'Gửi Đơn Đăng Ký Tư Vấn 14 Ngày', channel: 'Direct Web', status: '201 Created' }
+    ];
+
+    function getAdmins() {
+      const data = localStorage.getItem('tourflow_admins');
+      return data ? JSON.parse(data) : DEFAULT_ADMINS;
+    }
+    function saveAdmins(admins) {
+      localStorage.setItem('tourflow_admins', JSON.stringify(admins));
+    }
+
+    function getBookings() {
+      const data = localStorage.getItem('tourflow_bookings');
+      return data ? JSON.parse(data) : DEFAULT_BOOKINGS;
+    }
+    function saveBookings(bookings) {
+      localStorage.setItem('tourflow_bookings', JSON.stringify(bookings));
+    }
+
+    // 2. AUTHENTICATION CONTROLLER
+    let currentSessionUser = null;
+
+    function checkAuthOnLoad() {
+      const session = sessionStorage.getItem('tourflow_admin_session');
+      if (session) {
+        currentSessionUser = JSON.parse(session);
+        renderDashboard();
+      } else {
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('dashboard-section').classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value.trim();
+
+      const admins = getAdmins();
+      const matched = admins.find(a => a.username === u && a.password === p);
+
+      if (matched) {
+        currentSessionUser = matched;
+        sessionStorage.setItem('tourflow_admin_session', JSON.stringify(matched));
+        document.getElementById('login-error').classList.add('hidden');
+        renderDashboard();
+      } else {
+        const errEl = document.getElementById('login-error');
+        errEl.classList.remove('hidden');
+        document.getElementById('login-error-msg').innerText = 'Sai tên đăng nhập hoặc mật khẩu. Vui lòng kiểm tra lại!';
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('tourflow_admin_session');
+      currentSessionUser = null;
+      document.getElementById('dashboard-section').classList.add('hidden');
+      document.getElementById('login-section').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    // 3. DASHBOARD RENDERING & TABS
+    
+    function renderEmailsTable() {
+      const tbody = document.getElementById('emails-tbody');
+      if (!tbody) return;
+      const emails = JSON.parse(localStorage.getItem('waldo_kool_sent_emails') || '[]');
+      
+      if (emails.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">Chưa có email xác nhận nào được gửi đi gần đây.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = emails.map(em => `
+        <tr class="hover:bg-slate-800/30 transition">
+          <td class="p-4 font-mono text-cyan-400">${em.sent_at}</td>
+          <td class="p-4">
+            <span class="font-mono font-bold text-white block">${em.booking_id}</span>
+            <span class="text-slate-400 text-[11px]">${em.customer_name}</span>
+          </td>
+          <td class="p-4 font-mono text-sky-300 font-semibold">${em.recipient}</td>
+          <td class="p-4 max-w-xs truncate text-slate-200" title="${em.subject}">${em.subject}</td>
+          <td class="p-4">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <i data-lucide="check" class="w-3 h-3 inline mr-0.5"></i> ${em.status}
+            </span>
+          </td>
+          <td class="p-4 text-right">
+            <button onclick="viewSentEmailModal('${em.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-600/20 text-sky-300 hover:bg-sky-600/40 border border-sky-500/30 transition inline-flex items-center gap-1">
+              <i data-lucide="eye" class="w-3 h-3"></i> Xem Bản In
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function viewSentEmailModal(emailId) {
+      const emails = JSON.parse(localStorage.getItem('waldo_kool_sent_emails') || '[]');
+      const found = emails.find(e => e.id === emailId);
+      if (found && found.html_content) {
+        const w = window.open('', '_blank', 'width=700,height=800,scrollbars=yes');
+        w.document.write(found.html_content);
+        w.document.close();
+      }
+    }
+
+    function renderDashboard() {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('dashboard-section').classList.remove('hidden');
+
+      // Update Header info
+      document.getElementById('header-username').innerText = currentSessionUser.fullName;
+      document.getElementById('header-userrole').innerText = currentSessionUser.role === 'main_admin' ? 'Super Admin' : 'Sub Admin';
+      document.getElementById('user-avatar').innerText = currentSessionUser.username.substring(0, 2).toUpperCase();
+
+      const roleBadge = document.getElementById('role-badge');
+      if (currentSessionUser.role === 'main_admin') {
+        roleBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30';
+        roleBadge.innerText = 'Main Admin';
+        document.getElementById('create-admin-box').classList.remove('hidden');
+        document.getElementById('subadmin-warning').classList.add('hidden');
+      } else {
+        roleBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30';
+        roleBadge.innerText = 'Sub Admin';
+        document.getElementById('create-admin-box').classList.add('hidden');
+        document.getElementById('subadmin-warning').classList.remove('hidden');
+      }
+
+      renderBookingsTable();
+      renderEmailsTable();
+      renderAdminsTable();
+      renderAccessLogsTable();
+      updateTopStats();
+      lucide.createIcons();
+    }
+
+    function switchTab(tabKey) {
+      const tabs = ['bookings', 'emails', 'analytics', 'admins'];
+      tabs.forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        const btnEl = document.getElementById(`tab-btn-${t}`);
+        if (t === tabKey) {
+          tabEl.classList.remove('hidden');
+          btnEl.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-md shadow-blue-600/30 flex items-center gap-2 transition';
+        } else {
+          tabEl.classList.add('hidden');
+          btnEl.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 transition';
+        }
+      });
+      lucide.createIcons();
+    }
+
+    function updateTopStats() {
+      const bookings = getBookings();
+      document.getElementById('stat-bookings').innerText = bookings.length;
+      
+      let totalVND = 0;
+      bookings.forEach(b => {
+        totalVND += Number(b.total_estimated_price || 0);
+      });
+      const inMillion = (totalVND / 1000000).toFixed(1) + 'M';
+      document.getElementById('stat-revenue').innerText = inMillion;
+    }
+
+    // 4. BOOKINGS TABLE LOGIC
+    function renderBookingsTable() {
+      const tbody = document.getElementById('bookings-tbody');
+      const search = (document.getElementById('booking-search').value || '').toLowerCase();
+      const bookings = getBookings();
+
+      const filtered = bookings.filter(b => 
+        (b.customer_name || '').toLowerCase().includes(search) ||
+        (b.customer_phone || '').includes(search) ||
+        (b.tour_name || '').toLowerCase().includes(search) ||
+        (b.booking_id || '').toLowerCase().includes(search)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-500">Chưa tìm thấy đơn đặt tour nào phù hợp.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(b => {
+        const formattedPrice = Number(b.total_estimated_price || 0).toLocaleString('vi-VN') + ' đ';
+        return `
+          <tr class="hover:bg-slate-800/30 transition">
+            <td class="p-4 font-mono font-bold text-cyan-400">${b.booking_id}</td>
+            <td class="p-4">
+              <strong class="text-white block">${b.customer_name}</strong>
+              <span class="text-slate-400 font-mono text-[11px]">${b.customer_phone}</span>
+            </td>
+            <td class="p-4 max-w-[220px]">
+              <span class="truncate block text-slate-200" title="${b.tour_name}">${b.tour_name}</span>
+            </td>
+            <td class="p-4 font-mono">${b.departure_date}</td>
+            <td class="p-4">${b.pax_adults} NL ${b.pax_children ? `, ${b.pax_children} TE` : ''}</td>
+            <td class="p-4 font-mono font-bold text-emerald-400">${formattedPrice}</td>
+            <td class="p-4">
+              <span class="px-2 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">${b.status}</span>
+            </td>
+            <td class="p-4 text-right whitespace-nowrap">
+              <button onclick="handleDeleteBooking('${b.booking_id}')" class="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition" title="Xóa hồ sơ">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function handleDeleteBooking(id) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa đơn đặt tour mã ${id}?`)) return;
+      let bookings = getBookings();
+      bookings = bookings.filter(b => b.booking_id !== id);
+      saveBookings(bookings);
+      renderBookingsTable();
+      renderEmailsTable();
+      updateTopStats();
+    }
+
+    // 5. ADMINS MANAGEMENT (MAIN ADMIN CREATE & DELETE SUB-ADMINS)
+    function renderAdminsTable() {
+      const tbody = document.getElementById('admins-tbody');
+      const admins = getAdmins();
+
+      tbody.innerHTML = admins.map(a => {
+        const isMain = a.role === 'main_admin';
+        const roleLabel = isMain ? '<span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Main Admin (Super)</span>' : '<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">Sub-Admin</span>';
+        
+        let actionBtn = '';
+        if (currentSessionUser && currentSessionUser.role === 'main_admin') {
+          if (!isMain) {
+            actionBtn = `
+              <button onclick="handleDeleteSubAdmin('${a.id}', '${a.username}')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-red-400 hover:bg-red-500/10 border border-red-500/30 transition flex items-center gap-1 ml-auto">
+                <i data-lucide="trash" class="w-3.5 h-3.5"></i> Xóa Sub-Admin
+              </button>
+            `;
+          } else {
+            actionBtn = `<span class="text-slate-500 italic text-[11px]">Bảo vệ</span>`;
+          }
+        } else {
+          actionBtn = `<span class="text-slate-500 text-[11px]">Chỉ xem</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/30 transition">
+            <td class="p-4 font-bold text-white flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-xs font-mono text-cyan-400">
+                ${a.username.substring(0, 2).toUpperCase()}
+              </div>
+              ${a.fullName}
+            </td>
+            <td class="p-4 font-mono text-cyan-300 font-semibold">${a.username}</td>
+            <td class="p-4">${roleLabel}</td>
+            <td class="p-4 text-slate-400 font-mono">${a.createdAt}</td>
+            <td class="p-4"><span class="text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${a.status}</span></td>
+            <td class="p-4 text-right">${actionBtn}</td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function handleCreateSubAdmin(e) {
+      e.preventDefault();
+      if (!currentSessionUser || currentSessionUser.role !== 'main_admin') {
+        alert('Chỉ Main Admin mới có quyền tạo thêm tài khoản quản trị phụ!');
+        return;
+      }
+
+      const fn = document.getElementById('sub-fullname').value.trim();
+      const u = document.getElementById('sub-username').value.trim();
+      const p = document.getElementById('sub-password').value.trim();
+
+      const admins = getAdmins();
+      if (admins.find(a => a.username.toLowerCase() === u.toLowerCase())) {
+        alert('Tên đăng nhập này đã tồn tại! Vui lòng chọn tên khác.');
+        return;
+      }
+
+      const newAdmin = {
+        id: 'adm-' + Date.now(),
+        username: u,
+        password: p,
+        fullName: fn,
+        role: 'sub_admin',
+        createdAt: new Date().toLocaleDateString('vi-VN'),
+        status: 'ACTIVE'
+      };
+
+      admins.push(newAdmin);
+      saveAdmins(admins);
+      alert(`Đã tạo thành công tài khoản Sub-Admin [${u}]!`);
+      
+      document.getElementById('sub-fullname').value = '';
+      document.getElementById('sub-username').value = '';
+      document.getElementById('sub-password').value = '';
+
+      renderAdminsTable();
+    }
+
+    function handleDeleteSubAdmin(adminId, username) {
+      if (!currentSessionUser || currentSessionUser.role !== 'main_admin') {
+        alert('Chỉ Main Admin mới có quyền xóa Sub-Admin!');
+        return;
+      }
+
+      if (!confirm(`Bạn có chắc muốn xóa Sub-Admin [${username}] khỏi hệ thống?`)) return;
+
+      let admins = getAdmins();
+      admins = admins.filter(a => a.id !== adminId);
+      saveAdmins(admins);
+      renderAdminsTable();
+    }
+
+    // 6. ACCESS LOGS REALTIME
+    function renderAccessLogsTable() {
+      const tbody = document.getElementById('access-logs-tbody');
+      tbody.innerHTML = DEFAULT_LOGS.map(log => `
+        <tr class="hover:bg-slate-800/30 transition font-mono">
+          <td class="p-3 text-cyan-400">${log.time}</td>
+          <td class="p-3 text-slate-300 font-sans">${log.ip}</td>
+          <td class="p-3 text-white font-sans font-medium">${log.page}</td>
+          <td class="p-3 text-slate-400 font-sans">${log.channel}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${log.status}</span></td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    
+    async function handleCloudBackupClick() {
+      if (window.FirebaseBackupEngine) {
+        const res = await window.FirebaseBackupEngine.backupAllToCloud();
+        if (res.cloudId) {
+          alert(`✓ Sao lưu thành công lên Firebase Cloud Firestore! Mã bản ghi: ${res.cloudId}`);
+        } else if (res.localFile) {
+          alert('✓ Đã tạo và tải file sao lưu JSON an toàn về máy tính của bạn!');
+        } else {
+          alert('Đã đồng bộ sao lưu dữ liệu hệ thống.');
+        }
+      }
+    }
+
+    function refreshData() {
+      renderBookingsTable();
+      renderEmailsTable();
+      renderAdminsTable();
+      renderAccessLogsTable();
+      updateTopStats();
+      alert('Dữ liệu đã được đồng bộ mới nhất từ hệ thống!');
+    }
+
+    // Auto check on load
+    window.addEventListener('DOMContentLoaded', checkAuthOnLoad);
+  </script>
+</body>
+</html>
