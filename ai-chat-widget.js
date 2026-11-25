@@ -785,6 +785,23 @@ const generateKnowledgeResponse = (userText) => {
       history: getHistory()
     };
 
+    // If webhookUrl is a placeholder/mock domain, reply instantly using built-in RAG Tour Knowledge Engine
+    const isMockWebhook = !CONFIG.webhookUrl || CONFIG.webhookUrl.includes('waldokooltravel.vn') || CONFIG.webhookUrl.includes('vietjourneys.vn');
+
+    if (isMockWebhook) {
+      setTimeout(() => {
+        setTyping(false);
+        const botReply = generateKnowledgeResponse(userText);
+        const cleanedReply = detectAndProcessBookingOrder(botReply);
+        if (cleanedReply) {
+          appendMessage(cleanedReply, 'bot');
+          saveMessageToHistory('assistant', cleanedReply);
+        }
+      }, 400);
+      return;
+    }
+
+    // Otherwise, call live connected webhook (e.g., Dify, n8n, Flowise)
     try {
       const response = await fetch(CONFIG.webhookUrl, {
         method: 'POST',
@@ -813,10 +830,7 @@ const generateKnowledgeResponse = (userText) => {
       }
 
     } catch (error) {
-      console.error('[TourFlow Chat Error]:', error);
-      setTyping(false);
-
-      // Intelligent Tour Knowledge Base & AI Dispatcher Engine
+      console.warn('[TourFlow Chat Webhook Notice]: Calling fallback Knowledge Base Engine');
       setTimeout(() => {
         setTyping(false);
         const botReply = generateKnowledgeResponse(userText);
@@ -825,7 +839,7 @@ const generateKnowledgeResponse = (userText) => {
           appendMessage(cleanedReply, 'bot');
           saveMessageToHistory('assistant', cleanedReply);
         }
-      }, 350);
+      }, 300);
     }
   };
 
@@ -908,6 +922,25 @@ const generateKnowledgeResponse = (userText) => {
       clearHistory: () => {
         sessionStorage.removeItem(CONFIG.historyStorageKey);
         document.getElementById('tf-messages-feed').innerHTML = '';
+      }
+    };
+
+    // Alias window.TourFlowChat for full compatibility with landing page buttons
+    window.TourFlowChat = {
+      toggleWindow: (forceOpen) => {
+        if (forceOpen === true && !isOpen) {
+          toggleWindow();
+        } else if (forceOpen === false && isOpen) {
+          toggleWindow();
+        } else if (forceOpen === undefined) {
+          toggleWindow();
+        }
+      },
+      sendMessage: (msg) => {
+        if (!isOpen) toggleWindow();
+        setTimeout(() => {
+          sendMessageToServer(msg);
+        }, 300);
       }
     };
   };
